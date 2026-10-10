@@ -2,6 +2,8 @@
 title: Markdown PDF export check
 ---
 
+[toc]
+
 # Markdown 导出 PDF 验证
 
 中文与 English 内容应清晰可读，保留 **加粗**、*斜体* 和 [链接](https://github.com/Chihang03/vscode-office)。
@@ -32,6 +34,8 @@ flowchart LR
     A[Markdown] --> B[HTML]
     B --> C[PDF]
 ```
+
+<div class="page"></div>
 
 ## 本地图片
 

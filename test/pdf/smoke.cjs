@@ -1,8 +1,8 @@
 // Run after npm run build. Uses an installed browser; does not download Chromium.
 const { build } = require('esbuild');
-const { existsSync, mkdirSync, readFileSync } = require('node:fs');
+const { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } = require('node:fs');
 const path = require('node:path');
-const { PDFDocument } = require('pdf-lib');
+const { PDFDocument, PDFName } = require('pdf-lib');
 
 async function main() {
     const root = path.resolve(__dirname, '../..');
@@ -30,8 +30,11 @@ async function main() {
         } }],
     });
     const outputPath = path.join(out, 'sample.pdf');
+    const sourcePath = path.join(out, 'Markdown 导出验证 & 页眉.md');
+    writeFileSync(sourcePath, readFileSync(path.join(__dirname, 'sample.md')));
+    copyFileSync(path.join(__dirname, 'sample.svg'), path.join(out, 'sample.svg'));
     await require(bundle).convertMd({
-        markdownFilePath: path.join(__dirname, 'sample.md'),
+        markdownFilePath: sourcePath,
         config: { type: 'pdf', outputPath, executablePath: browser, format: 'A4',
             printBackground: true, margin: { top: 25 },
             puppeteerArgs: process.platform === 'linux' && process.getuid?.() === 0 ? ['--no-sandbox'] : [] },
@@ -39,7 +42,8 @@ async function main() {
     const bytes = readFileSync(outputPath);
     if (bytes.subarray(0, 5).toString() !== '%PDF-') throw new Error('Invalid PDF header.');
     const pdf = await PDFDocument.load(bytes);
-    if (!pdf.getPageCount()) throw new Error('Empty PDF.');
+    if (pdf.getPageCount() < 2) throw new Error('The sample must exercise repeated headers and pagination.');
+    if (pdf.catalog.has(PDFName.of('Outlines'))) throw new Error('The PDF should not contain a bookmark directory.');
     console.log(JSON.stringify({ outputPath, pages: pdf.getPageCount(), bytes: bytes.length }));
 }
 

@@ -63,6 +63,7 @@ test('PDF export waits for save and passes the selected destination', async () =
     await service.exportMarkdown();
     assert.deepEqual(state.events, ['dialog', 'save', 'convert', 'success']);
     assert.equal(state.options.config.outputPath, '/tmp/chosen.pdf');
+    assert.equal(state.options.config.withoutOutline, true);
 });
 
 test('cancelled save dialog causes no save, conversion, or success notification', async () => {
@@ -134,5 +135,67 @@ test('PDF browser failure closes the browser, cleans temp files, and preserves e
         assert.equal(fs.existsSync(state.tempFile), false);
         assert.equal(fs.existsSync(path.dirname(state.tempFile)), false);
         assert.equal(fs.readFileSync(output, 'utf8'), 'original');
+    } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('PDF pages use escaped filenames, local dates, and page numbers without a directory', async () => {
+    const { createPdfOptions } = await load('src/service/markdown/pdf-layout.js', {}, {});
+    const options = createPdfOptions('/docs/中文 & <report> "draft".md', {}, new Date(2026, 0, 2));
+    assert.equal(options.displayHeaderFooter, true);
+    assert.equal(options.outline, false);
+    assert.match(options.headerTemplate, /中文 &amp; &lt;report&gt; &quot;draft&quot;\.md/);
+    assert.match(options.headerTemplate, /2026-01-02/);
+    const header = require('node-html-parser').parse(options.headerTemplate).querySelector('div');
+    assert.match(header.getAttribute('style'), /font-size:10px/);
+    assert.match(options.footerTemplate, /class="pageNumber"/);
+    assert.match(options.footerTemplate, /class="totalPages"/);
+    assert.equal(options.margin.top, '64px');
+    assert.equal(options.margin.bottom, '48px');
+    const custom = createPdfOptions('/docs/notes.md', { margin: { top: 100, bottom: 80, left: 12 }, printBackground: false });
+    assert.equal(custom.margin.top, '100px');
+    assert.equal(custom.margin.bottom, '80px');
+    assert.equal(custom.margin.left, '12px');
+    assert.equal(custom.printBackground, false);
+});
+
+test('the PDF rendering path applies the header/footer options', async () => {
+    const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'office-pdf-layout-'));
+    const state = { closed: false };
+    const { exportByType } = await load('src/service/markdown/html-export.js', {
+        'puppeteer-core': `module.exports = { launch: async () => ({
+            newPage: async () => ({ goto: async () => {}, evaluate: async () => false,
+                pdf: async options => { state.options = options; return Buffer.from('%PDF-test'); } }),
+            close: async () => { state.closed = true; }
+        }) };`,
+    }, state);
+    try {
+        const outputPath = path.join(temp, 'renamed-output.pdf');
+        await exportByType(path.join(temp, 'original.md'), '<p>test</p>', 'pdf', { outputPath });
+        assert.match(state.options.headerTemplate, /original\.md/);
+        assert.equal(state.options.displayHeaderFooter, true);
+        assert.equal(state.options.outline, false);
+        assert.equal(state.closed, true);
+        assert.equal(fs.readFileSync(outputPath, 'utf8'), '%PDF-test');
+    } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('PDF omits generated TOC directives while retaining source and literal code', async () => {
+    const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'office-pdf-toc-'));
+    const source = path.join(temp, 'source.md');
+    const markdown = '# Alpha\n\n[toc]\n\n## Beta\n\n```text\n[toc]\n```\n';
+    fs.writeFileSync(source, markdown);
+    const state = {};
+    const { convertMd } = await load('src/service/markdown/markdown-pdf.js', {
+        vscode: 'export const Uri = { file: fsPath => ({ fsPath }) };',
+        './html-export': 'export async function exportByType(filePath, html) { state.html = html; }',
+    }, state);
+    try {
+        await convertMd({ markdownFilePath: source, config: { type: 'pdf' } });
+        const document = require('node-html-parser').parse(state.html);
+        assert.equal(document.querySelector('.table-of-contents'), null);
+        assert.equal(document.querySelectorAll('h1').length, 1);
+        assert.equal(document.querySelectorAll('h2').length, 1);
+        assert.match(document.querySelector('pre').textContent, /\[toc\]/);
+        assert.equal(fs.readFileSync(source, 'utf8'), markdown);
     } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });

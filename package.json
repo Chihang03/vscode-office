@@ -2,7 +2,7 @@
 	"name": "vscode-office",
 	"displayName": "Office Viewer (Chihang03)",
 	"description": "View word, excel, powerpoint files and using WYSIWYG editor for markdown.",
-	"version": "4.2.1",
+	"version": "4.2.2",
 	"publisher": "Chihang03",
 	"icon": "image/logo.png",
 	"engines": {

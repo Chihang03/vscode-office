@@ -79,11 +79,11 @@ export class MarkdownService {
 
     public getConfig(option: ExportOption) {
         const top = Global.getConfig("pdfMarginTop")
-        const { type = 'pdf', withoutOutline = false } = option;
+        const { type = 'pdf' } = option;
         return {
             type,
             "styles": [],
-            withoutOutline,
+            withoutOutline: true,
             // chromium path
             "executablePath": type === 'html' ? undefined : this.getChromiumPath(),
             // puppeteer launch args (useful for Linux servers running as root)

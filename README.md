@@ -4,6 +4,8 @@ This is [Chihang03's fork](https://github.com/Chihang03/vscode-office) of [cweij
 
 This fork adds Markdown-to-PDF commands to the command palette, editor toolbar, editor context menu, and file explorer context menu. Select a `.md` or `.markdown` file, run **Office Viewer: Export Markdown to PDF**, and choose the destination. It waits for pending editor updates and source-file saving, shows export progress, and offers to open the completed PDF. Cancelling the destination dialog stops the export.
 
+PDF pages show the source filename at the top left, the local export date (`YYYY-MM-DD`) at the top right, and centered `page / total` numbers at the bottom. No table of contents or PDF bookmark directory is generated; rendered `[toc]` directives are omitted from the PDF without changing the source. Header/footer space is reserved automatically.
+
 PDF export requires a Chromium browser on the extension host (Chrome, Edge, or Chromium). Set `vscode-office.chromiumPath` if automatic detection fails. Browser-only VS Code is not supported; remote SSH/container use requires the browser to be installed in that remote environment. For local testing, disable the upstream Office Viewer extension because the fork currently retains its command and editor IDs.
 
 

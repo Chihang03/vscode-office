@@ -2,7 +2,7 @@ const fs = require("fs")
 const os = require("os")
 const path = require("path")
 const { pathToFileURL } = require("url")
-const { createOutline } = require("./outline")
+const { createPdfOptions } = require("./pdf-layout")
 const isDev = process.argv.indexOf('--type=extensionHost') >= 0;
 
 export async function exportHtml(exportFilePath, data) {
@@ -60,25 +60,8 @@ export async function exportByType(filePath, data, type, config) {
                 })
             }))
         })
-        const margin = config.margin || {}
-        const pdf = await page.pdf({
-            format: config.format || "A4",
-            printBackground: config.printBackground ?? true,
-            margin: {
-                top: margin.top != null ? `${margin.top}px` : undefined,
-                right: margin.right != null ? `${margin.right}px` : undefined,
-                bottom: margin.bottom != null ? `${margin.bottom}px` : undefined,
-                left: margin.left != null ? `${margin.left}px` : undefined
-            }
-        })
-        let pdfBytes = Buffer.from(pdf)
-        if (!config.withoutOutline) {
-            try {
-                pdfBytes = await createOutline(pdf, await page.content())
-            } catch (error) {
-                showErrorMessage("createOutline()", error)
-            }
-        }
+        const pdf = await page.pdf(createPdfOptions(filePath, config))
+        const pdfBytes = Buffer.from(pdf)
         fs.writeFileSync(targetFilePath, pdfBytes)
         console.log("[pretty-md-pdf] Exported to file: " + targetFilePath)
     } finally {

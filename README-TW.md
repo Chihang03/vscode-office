@@ -4,6 +4,8 @@
 
 本版本新增 Markdown 匯出 PDF 的命令選擇區、編輯器工具列、編輯器右鍵及檔案總管右鍵入口。開啟或選取 `.md` / `.markdown` 檔案，執行 **Office Viewer: 將 Markdown 匯出為 PDF**，選擇輸出位置。匯出會等待編輯器內容同步並儲存來源檔案，顯示進度，成功後可按「開啟 PDF」。取消輸出位置選擇會停止匯出。
 
+PDF 每頁左上角顯示來源檔名（含副檔名），右上角顯示本機匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。不產生目錄或 PDF 書籤目錄；`[toc]` 指令不會產生匯出目錄，來源 Markdown 保持原樣。頁首頁尾會自動保留空間。
+
 PDF 匯出需要擴充功能執行環境中的 Chrome、Edge 或 Chromium。自動偵測失敗時，設定 `vscode-office.chromiumPath` 為瀏覽器執行檔路徑。純瀏覽器版 VS Code 不支援；SSH 或容器開發需要在遠端環境安裝瀏覽器。本機測試請停用上游 Office Viewer，本分支目前沿用其命令與編輯器 ID。
 
 
