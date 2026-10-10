@@ -1,4 +1,11 @@
-# Office Viewer
+# Office Viewer (Chihang03)
+
+本仓库是 [Chihang03 的开发分支](https://github.com/Chihang03/vscode-office)，基于 [cweijan/vscode-office](https://github.com/cweijan/vscode-office) 的 `main` 提交 `908258dafc827ce0475fe7671d414914fbd3867b`。保留原项目的 MIT 许可证及第三方声明。
+
+本版本增加 Markdown 导出 PDF 的命令面板、编辑器工具栏、编辑器右键和文件资源管理器右键入口。打开或选中 `.md` / `.markdown` 文件，运行 **Office Viewer: 将 Markdown 导出为 PDF**，选择输出位置。导出前会等待编辑器内容同步并保存源文件，显示导出进度，成功后可点击“打开 PDF”。取消输出位置选择会停止导出。
+
+PDF 导出需要扩展运行环境中的 Chrome、Edge 或 Chromium。自动检测失败时，设置 `vscode-office.chromiumPath` 为浏览器可执行文件路径。纯浏览器版 VS Code 不支持此功能；通过 SSH 或容器开发时，需要在远程环境安装浏览器。本地测试时请禁用上游 Office Viewer 扩展，本分支目前仍沿用其命令和编辑器 ID。
+
 
 [English](README.md) | 简体中文 | [繁體中文](README-TW.md)
 
@@ -72,15 +79,15 @@ Office Viewer 内置完整的 Git 历史工作区，让你无需离开 VS Code �
 
 ### 环境要求
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 22.12+
 - [VS Code](https://code.visualstudio.com/) 1.64+
 
 ### 快速开始
 
 ```bash
-git clone https://github.com/cweijan/vscode-office.git
+git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
-npm install
+npm ci
 ```
 
 ### 开发调试
@@ -108,30 +115,20 @@ npm run build    # 生产构建
 npm run package  # 生成 .vsix
 ```
 
-## 使用数据（Usage Data）
+## 验证
 
-Office Viewer 会收集**匿名使用数据**，用于了解各预览功能的使用情况，以便改进扩展。数据通过官方模块 [`@vscode/extension-telemetry`](https://www.npmjs.com/package/@vscode/extension-telemetry) 发送至 [Azure Application Insights](https://learn.microsoft.com/zh-cn/azure/azure-monitor/app/app-insights-overview)。
+```sh
+npm run test:pdf         # 保存顺序、取消、失败提示、输出路径及临时文件清理
+npm run build
+npm run test:pdf:smoke   # 使用已安装浏览器生成 out/pdf-smoke/sample.pdf
+npm run package         # 生成 VSIX，不发布到扩展市场
+```
 
-### 收集内容
+真实浏览器测试可通过 `OFFICE_PDF_CHROMIUM_PATH` 指定浏览器路径。生成后检查中文、表格、代码、公式、Mermaid 图及本地图片。Windows、Linux 及远程扩展环境还需要在对应主机验证。
 
-| 事件 | 触发时机 | 属性 |
-|------|---------|------|
-| `view.open` | 打开自定义预览/编辑器 | `viewType`（如 `excel`、`markdown`、`pdf`）、`fileType`（仅扩展名，如 `xlsx`、`md`） |
+## 使用数据
 
-**不会**收集文件路径、文件名、URL、仓库名、请求内容或其他可识别个人身份的信息。
-
-### 如何关闭
-
-仅在以下**两项均允许**时才会上报：
-
-1. VS Code 全局遥测已开启（`telemetry.telemetryLevel` 不为 `off`，或旧版中 `telemetry.enableTelemetry` 为 `true`）。
-2. 扩展遥测已开启：在设置中将 `vscode-office.enableTelemetry` 设为 `false` 可单独关闭本扩展的上报。
-
-也可在 **设置 → 应用程序 → 遥测** 中关闭 VS Code 的全部遥测。
-
-### 维护者配置
-
-若自行构建并发布本扩展，请参阅 [docs/telemetry.md](docs/telemetry.md) 配置 Azure Application Insights 及示例查询。
+本分支关闭扩展遥测，并移除上游 Application Insights 连接配置。以后如需采集使用数据，应配置自己的服务，并在启用前更新说明。
 
 ## Credits
 

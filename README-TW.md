@@ -1,4 +1,11 @@
-# Office Viewer
+# Office Viewer (Chihang03)
+
+本儲存庫是 [Chihang03 的開發分支](https://github.com/Chihang03/vscode-office)，基於 [cweijan/vscode-office](https://github.com/cweijan/vscode-office) 的 `main` 提交 `908258dafc827ce0475fe7671d414914fbd3867b`。保留原專案的 MIT 授權及第三方聲明。
+
+本版本新增 Markdown 匯出 PDF 的命令選擇區、編輯器工具列、編輯器右鍵及檔案總管右鍵入口。開啟或選取 `.md` / `.markdown` 檔案，執行 **Office Viewer: 將 Markdown 匯出為 PDF**，選擇輸出位置。匯出會等待編輯器內容同步並儲存來源檔案，顯示進度，成功後可按「開啟 PDF」。取消輸出位置選擇會停止匯出。
+
+PDF 匯出需要擴充功能執行環境中的 Chrome、Edge 或 Chromium。自動偵測失敗時，設定 `vscode-office.chromiumPath` 為瀏覽器執行檔路徑。純瀏覽器版 VS Code 不支援；SSH 或容器開發需要在遠端環境安裝瀏覽器。本機測試請停用上游 Office Viewer，本分支目前沿用其命令與編輯器 ID。
+
 
 [English](README.md) | [简体中文](README-CN.md) | 繁體中文
 
@@ -72,15 +79,15 @@ Office Viewer 內建完整的 Git 歷史工作區，讓你無需離開 VS Code �
 
 ### 環境要求
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 22.12+
 - [VS Code](https://code.visualstudio.com/) 1.64+
 
 ### 快速開始
 
 ```bash
-git clone https://github.com/cweijan/vscode-office.git
+git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
-npm install
+npm ci
 ```
 
 ### 開發除錯
@@ -108,30 +115,9 @@ npm run build    # 生產建置
 npm run package  # 產生 .vsix
 ```
 
-## 使用資料（Usage Data）
+## 使用資料
 
-Office Viewer 會收集**匿名使用資料**，用於了解各預覽功能的使用情況，以便改進擴充功能。資料透過官方模組 [`@vscode/extension-telemetry`](https://www.npmjs.com/package/@vscode/extension-telemetry) 傳送至 [Azure Application Insights](https://learn.microsoft.com/zh-tw/azure/azure-monitor/app/app-insights-overview)。
-
-### 收集內容
-
-| 事件 | 觸發時機 | 屬性 |
-|------|---------|------|
-| `view.open` | 開啟自訂預覽/編輯器 | `viewType`（如 `excel`、`markdown`、`pdf`）、`fileType`（僅副檔名，如 `xlsx`、`md`） |
-
-**不會**收集檔案路徑、檔名、URL、儲存庫名稱、請求內容或其他可識別個人身份的資訊。
-
-### 如何關閉
-
-僅在以下**兩項均允許**時才會上報：
-
-1. VS Code 全域遙測已開啟（`telemetry.telemetryLevel` 不為 `off`，或舊版中 `telemetry.enableTelemetry` 為 `true`）。
-2. 擴充功能遙測已開啟：在設定中將 `vscode-office.enableTelemetry` 設為 `false` 可單獨關閉本擴充功能的上報。
-
-也可在 **設定 → 應用程式 → 遙測** 中關閉 VS Code 的全部遙測。
-
-### 維護者設定
-
-若自行建置並發佈本擴充功能，請參閱 [docs/telemetry.md](docs/telemetry.md) 設定 Azure Application Insights 及範例查詢。
+本分支關閉擴充功能遙測，並移除上游 Application Insights 連線設定。未來若要收集使用資料，應設定自己的服務並在啟用前更新說明。
 
 ## Credits
 

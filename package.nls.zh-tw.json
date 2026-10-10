@@ -12,7 +12,7 @@
 	"ext.html.noFile": "沒有可預覽的 HTML 檔案。",
 	"ext.markdown.exportStart": "正在開始匯出 Markdown 為 $1。",
 	"ext.markdown.exportSuccess": "匯出 Markdown 為 $1 成功！",
-	"ext.markdown.noChromium": "未找到 Chromium，匯出失敗。",
+	"ext.markdown.noChromium": "找不到 Chromium 瀏覽器。請安裝 Chrome、Edge 或 Chromium，或將 vscode-office.chromiumPath 設為瀏覽器執行檔路徑。",
 	"ext.markdown.noClipboardImage": "剪貼簿中沒有圖片。",
 	"ext.markdown.noPasteDirectory": "不支援貼上目錄。",
 	"ext.markdown.installXclip": "請先安裝 xclip 命令。",
@@ -23,5 +23,10 @@
 	"ext.markdown.customAiUrlRequired": "自訂 AI：API URL 為必填項。",
 	"ext.markdown.customAiPolishFailed": "自訂 AI 潤色失敗：$1",
 	"ext.markdown.selectImage": "選擇圖片",
-	"ext.markdown.statusBar": "行 $1 字數 $2"
+	"ext.markdown.statusBar": "行 $1 字數 $2",
+	"ext.markdown.exportPdf": "將 Markdown 匯出為 PDF",
+	"ext.markdown.exportRequiresFile": "請選擇擴充功能執行環境中已儲存的 Markdown 檔案（.md 或 .markdown）進行匯出。",
+	"ext.markdown.exportSaveFailed": "無法儲存 Markdown 檔案，已停止 PDF 匯出。",
+	"ext.markdown.exportFailed": "Markdown 匯出失敗：$1",
+	"ext.markdown.openExport": "開啟 PDF"
 }

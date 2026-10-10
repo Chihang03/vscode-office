@@ -1,4 +1,11 @@
-# Office Viewer
+# Office Viewer (Chihang03)
+
+This is [Chihang03's fork](https://github.com/Chihang03/vscode-office) of [cweijan/vscode-office](https://github.com/cweijan/vscode-office), based on upstream `main` commit `908258dafc827ce0475fe7671d414914fbd3867b`. The original MIT license and third-party notices are retained.
+
+This fork adds Markdown-to-PDF commands to the command palette, editor toolbar, editor context menu, and file explorer context menu. Select a `.md` or `.markdown` file, run **Office Viewer: Export Markdown to PDF**, and choose the destination. It waits for pending editor updates and source-file saving, shows export progress, and offers to open the completed PDF. Cancelling the destination dialog stops the export.
+
+PDF export requires a Chromium browser on the extension host (Chrome, Edge, or Chromium). Set `vscode-office.chromiumPath` if automatic detection fails. Browser-only VS Code is not supported; remote SSH/container use requires the browser to be installed in that remote environment. For local testing, disable the upstream Office Viewer extension because the fork currently retains its command and editor IDs.
+
 
 English | [简体中文](README-CN.md) | [繁體中文](README-TW.md)
 
@@ -72,15 +79,15 @@ Database Client for Visual Studio Code, supporting the management of **MySQL/Mar
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 22.12+
 - [VS Code](https://code.visualstudio.com/) 1.64+
 
 ### Getting started
 
 ```bash
-git clone https://github.com/cweijan/vscode-office.git
+git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
-npm install
+npm ci
 ```
 
 ### Development
@@ -108,30 +115,20 @@ npm run build    # production build
 npm run package  # create .vsix
 ```
 
+## Validation
+
+```sh
+npm run test:pdf         # save, cancellation, failure, destination, cleanup checks
+npm run build
+npm run test:pdf:smoke   # generates out/pdf-smoke/sample.pdf with an installed browser
+npm run package         # creates the VSIX; does not publish it
+```
+
+Use `OFFICE_PDF_CHROMIUM_PATH` to specify the browser executable for the smoke test. Inspect the generated PDF for Chinese text, tables, code, math, Mermaid diagrams, and the local image. Windows, Linux, and remote extension-host behavior still need validation on those hosts.
+
 ## Usage data
 
-Office Viewer collects **anonymous usage data** to understand which preview features are used, so we can improve the extension. Data is sent to [Azure Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview) via the official [`@vscode/extension-telemetry`](https://www.npmjs.com/package/@vscode/extension-telemetry) module.
-
-### What we collect
-
-| Event         | When                              | Properties                                                                                                 |
-| ------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `view.open` | A custom preview/editor is opened | `viewType` (e.g. `excel`, `markdown`, `pdf`), `fileType` (extension only, e.g. `xlsx`, `md`) |
-
-We **do not** collect file paths, file names, URLs, repository names, request contents, or other personally identifiable information.
-
-### How to opt out
-
-Telemetry is sent only when **both** of the following allow it:
-
-1. VS Code global telemetry is enabled (`telemetry.telemetryLevel` is not `off`, or `telemetry.enableTelemetry` is `true` on older versions).
-2. Extension telemetry is enabled: set `vscode-office.enableTelemetry` to `false` in Settings.
-
-You can also disable all VS Code telemetry in **Settings → Application → Telemetry**.
-
-### Maintainer setup
-
-If you build and publish this extension yourself, see [docs/telemetry.md](docs/telemetry.md) for Azure Application Insights setup and sample queries.
+This fork disables extension telemetry and removes the upstream Application Insights connection string. To add telemetry later, configure your own service and update the disclosure before enabling it.
 
 ## Credits
 

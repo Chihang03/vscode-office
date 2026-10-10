@@ -37,6 +37,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const markdownEditorProvider = new MarkdownEditorProvider(context)
 	context.subscriptions.push(
 		vscode.commands.registerCommand('office.markdown.switch', (uri) => { markdownService.switchEditor(uri) }),
+		vscode.commands.registerCommand('office.markdown.exportPdf', (uri) => markdownService.exportMarkdown(uri, { type: 'pdf' })),
 		vscode.commands.registerCommand('office.csv.switch', (uri) => { switchCsvEditor(uri) }),
 		vscode.commands.registerCommand('office.markdown.paste', () => { markdownService.loadClipboardImage() }),
 		vscode.commands.registerCommand('office.html.preview', uri => HtmlService.previewHtml(uri, context)),

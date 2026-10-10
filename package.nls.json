@@ -12,7 +12,7 @@
 	"ext.html.noFile": "No HTML file to preview.",
 	"ext.markdown.exportStart": "Starting export markdown to $1.",
 	"ext.markdown.exportSuccess": "Export markdown to $1 success!",
-	"ext.markdown.noChromium": "Not chromium found, export fail.",
+	"ext.markdown.noChromium": "No Chromium browser found. Install Chrome, Edge, or Chromium, or set vscode-office.chromiumPath to the browser executable.",
 	"ext.markdown.noClipboardImage": "There is not an image in the clipboard.",
 	"ext.markdown.noPasteDirectory": "Not support paste directory.",
 	"ext.markdown.installXclip": "You need to install xclip command first.",
@@ -23,5 +23,10 @@
 	"ext.markdown.customAiUrlRequired": "Custom AI: API URL is required.",
 	"ext.markdown.customAiPolishFailed": "Custom AI Polish failed: $1",
 	"ext.markdown.selectImage": "Select Image",
-	"ext.markdown.statusBar": "Line $1 Count $2"
+	"ext.markdown.statusBar": "Line $1 Count $2",
+	"ext.markdown.exportPdf": "Export Markdown to PDF",
+	"ext.markdown.exportRequiresFile": "Select a saved Markdown file (.md or .markdown) on the extension host to export.",
+	"ext.markdown.exportSaveFailed": "The Markdown file could not be saved. PDF export was stopped.",
+	"ext.markdown.exportFailed": "Markdown export failed: $1",
+	"ext.markdown.openExport": "Open PDF"
 }
