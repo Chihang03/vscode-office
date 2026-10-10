@@ -14,8 +14,8 @@ jobs:
         node-version: 22.x
         cache: npm
     - run: npm ci
-    - run: npm run test:pdf
     - run: |
         echo ">>> Start compile vscode-office."
         npm run build
         echo ">>> Compile vscode-office sucess!"
+    - run: npm run test:pdf
