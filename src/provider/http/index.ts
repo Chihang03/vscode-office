@@ -53,9 +53,9 @@ export async function activateHttp(context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
         requestController,
         codeSnippetController,
-        commands.registerCommand('vscode-office.request', (_document: TextDocument, range: Range) => requestController.run(range)),
-        commands.registerCommand('vscode-office.copy-request-as-curl', (document: TextDocument, range: Range) => codeSnippetController.copyAsCurl(document, range)),
-        commands.registerCommand('vscode-office._openDocumentLink', args => {
+        commands.registerCommand('kieranDocumentStudio.request', (_document: TextDocument, range: Range) => requestController.run(range)),
+        commands.registerCommand('kieranDocumentStudio.copy-request-as-curl', (document: TextDocument, range: Range) => codeSnippetController.copyAsCurl(document, range)),
+        commands.registerCommand('kieranDocumentStudio._openDocumentLink', args => {
             workspace.openTextDocument(Uri.parse(args.path)).then(window.showTextDocument, error => {
                 window.showErrorMessage(error.message);
             });

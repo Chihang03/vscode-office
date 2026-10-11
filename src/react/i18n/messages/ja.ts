@@ -10,7 +10,7 @@ export default {
         close: '閉じる',
         delete: '削除',
         loading: '読み込み中...',
-        officeViewer: 'Office Viewer',
+        officeViewer: 'Kieran Document Studio',
         switchToLight: 'ライトモードに切り替え',
         switchToDark: 'アダプティブダークモードに切り替え',
         editInVscode: 'VS Code で編集',

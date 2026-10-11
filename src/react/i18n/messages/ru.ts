@@ -10,7 +10,7 @@ export default {
         close: 'Закрыть',
         delete: 'Удалить',
         loading: 'Загрузка...',
-        officeViewer: 'Просмотр Office',
+        officeViewer: 'Kieran Document Studio',
         switchToLight: 'Переключить на светлую тему',
         switchToDark: 'Переключить на адаптивную тёмную тему',
         editInVscode: 'Редактировать в VS Code',

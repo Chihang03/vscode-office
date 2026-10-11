@@ -97,16 +97,9 @@ export function handleCommonEvent(uri: Uri, handler: Handler, options?: { skipOp
             fileSaveTimes[target.toString()] = Date.now();
             setDirty(handler, uri, false);
             handler.emit("saveDone");
-            await vscode.commands.executeCommand('vscode.openWith', target, 'cweijan.officeViewer');
+            await vscode.commands.executeCommand('vscode.openWith', target, 'kieranDocumentStudio.officeViewer');
         })
         .on('developerTool', () => vscode.commands.executeCommand('workbench.action.toggleDevTools'))
-        .on('sponsorClick', () => { })
-        .on('openSponsor', () => {
-            vscode.commands.executeCommand(
-                'workbench.extensions.action.showExtensionsWithIds',
-                ['cweijan.vscode-database-client2'],
-            );
-        })
         .on('openExternal', (url: string) => {
             if (url) {
                 vscode.env.openExternal(vscode.Uri.parse(url));

@@ -1,6 +1,11 @@
-# Office Viewer
+# Kieran Document Studio（文档工作台）
 
 English | [简体中文](README-CN.md) | [繁體中文](README-TW.md)
+
+
+Maintained independently by **Kieran Dai** (GitHub: **Chihang03**; publisher: **chihang03**). This is a **community fork of [cweijan/vscode-office](https://github.com/cweijan/vscode-office)**. It is not an official upstream release and is not endorsed by the upstream authors or Microsoft. Original copyrights, MIT license, and Git history are retained; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+The independent extension ID is **`chihang03.kieran-document-studio`**, starting at preview version **0.1.0**. It installs separately from `cweijan.vscode-office`. Use a VSIX built from this repository; future release packages will be listed under [Releases](https://github.com/Chihang03/vscode-office/releases). This branding revision does not establish Marketplace approval. Settings, commands and custom editor IDs have independent namespaces; see the [migration guide](docs/migration.md).
 
 ## Introduction
 
@@ -21,9 +26,8 @@ This extension lets you preview and edit common office and design files directly
 
 ## Git History
 
-Office Viewer includes a full Git History workspace for exploring repositories without leaving VS Code. Open it from the Source Control view, the editor title bar, the editor context menu, or the file explorer context menu.
+Kieran Document Studio includes a full Git History workspace for exploring repositories without leaving VS Code. Open it from the Source Control view, the editor title bar, the editor context menu, or the file explorer context menu.
 
-![1783342874748](image/README/1783342874748.png)
 
 ## Markdown
 
@@ -40,9 +44,8 @@ To use the built-in VS Code Markdown editor instead, add this to your `settings.
 }
 ```
 
-Right-click in the editor to export Markdown to PDF, DOCX, or HTML. PDF export requires Chromium; set the browser path with `vscode-office.chromiumPath`.
+Right-click in the editor to export Markdown to PDF, DOCX, or HTML. PDF export requires Chromium; set the browser path with `kieran-document-studio.chromiumPath`.
 
-![Export Markdown](image/README-CN/1685418034035.png)
 
 Shortcuts: Based on [shortcut.md](shortcut.md), plus:
 
@@ -57,28 +60,22 @@ Shortcuts: Based on [shortcut.md](shortcut.md), plus:
 
 - HTML: live preview while editing; press `Ctrl+Shift+V` to open the live view
 - YAML: document outline and anchor navigation (Go to Definition for alias references)
-- Icon theme: includes a subset of [Material Icon Theme](https://github.com/PKief/vscode-material-icon-theme) icons, plus **Office Material Icon Theme** and **One Dark Modern** color themes
+- Icon theme: includes a subset of [Material Icon Theme](https://github.com/PKief/vscode-material-icon-theme) icons, plus **Material Icons (Kieran Document Studio)** and **One Dark Modern (Kieran Document Studio)** color themes
 - Excel: preview and save `.xlsx`, `.xls`, `.xlsm`, `.csv`, and `.ods` files
 - HTTP: send requests from `.http` and `.rest` files (integrated from [REST Client](https://github.com/Huachao/vscode-restclient) with fixes for local request issues); press `Ctrl+Enter` / `⌘ Enter` to send
 - Java: decompile and view `.class` files
-
-## Sponsor
-
-[![Database Client](https://doc.database-client.com/public/logo.png)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2)
-
-Database Client for Visual Studio Code, supporting the management of **MySQL/MariaDB, PostgreSQL, SQLite, Redis**, and **ElasticSearch**, and works as an **SSH** client to boost your productivity! [Get it now](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2).
 
 ## Development Guide
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 24 (tested build and packaging runtime)
 - [VS Code](https://code.visualstudio.com/) 1.64+
 
 ### Getting started
 
 ```bash
-git clone https://github.com/cweijan/vscode-office.git
+git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
 npm install
 ```
@@ -105,33 +102,14 @@ Choose **Extension (Web)** from Run and Debug.
 
 ```bash
 npm run build    # production build
-npm run package  # create .vsix
+npm run package  # create an independent chihang03 VSIX
 ```
 
 ## Usage data
 
-Office Viewer collects **anonymous usage data** to understand which preview features are used, so we can improve the extension. Data is sent to [Azure Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview) via the official [`@vscode/extension-telemetry`](https://www.npmjs.com/package/@vscode/extension-telemetry) module.
+This community fork ships **without a telemetry endpoint** and does not send extension usage events. The inherited Application Insights connection has been removed. The reserved `kieran-document-studio.enableTelemetry` setting defaults to `false`; setting it to `true` alone does not enable reporting in this build. See [docs/telemetry.md](docs/telemetry.md).
 
-### What we collect
-
-| Event         | When                              | Properties                                                                                                 |
-| ------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `view.open` | A custom preview/editor is opened | `viewType` (e.g. `excel`, `markdown`, `pdf`), `fileType` (extension only, e.g. `xlsx`, `md`) |
-
-We **do not** collect file paths, file names, URLs, repository names, request contents, or other personally identifiable information.
-
-### How to opt out
-
-Telemetry is sent only when **both** of the following allow it:
-
-1. VS Code global telemetry is enabled (`telemetry.telemetryLevel` is not `off`, or `telemetry.enableTelemetry` is `true` on older versions).
-2. Extension telemetry is enabled: set `vscode-office.enableTelemetry` to `false` in Settings.
-
-You can also disable all VS Code telemetry in **Settings → Application → Telemetry**.
-
-### Maintainer setup
-
-If you build and publish this extension yourself, see [docs/telemetry.md](docs/telemetry.md) for Azure Application Insights setup and sample queries.
+User-triggered HTTP requests, remote document resources and AI features still use their configured services. They are separate from extension usage telemetry.
 
 ## Credits
 

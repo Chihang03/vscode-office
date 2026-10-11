@@ -5,12 +5,12 @@ import * as vscode from 'vscode';
 
 /** Existing package.json viewTypes that are desktop-only; on web show the unsupported screen instead. */
 const WEB_UNSUPPORTED_VIEW_TYPES = [
-	'cweijan.archiveViewer',
-	'cweijan.classViewer',
+	'kieranDocumentStudio.archiveViewer',
+	'kieranDocumentStudio.classViewer',
 ] as const;
 
 /**
- * Web-only: registers desktop-only custom editors and routes them to the Office Viewer
+ * Web-only: registers desktop-only custom editors and routes them to the Kieran Document Studio
  * "web unsupported" screen (no extra package.json contribution).
  */
 export class WebUnsupportedViewerProvider implements vscode.CustomReadonlyEditorProvider {

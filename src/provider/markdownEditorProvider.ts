@@ -53,7 +53,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     private aiAbortController: AbortController | null = null;
     private aiCancellationSource: vscode.CancellationTokenSource | null = null;
 
-    private getMarkdownTelemetryProps(configuration = vscode.workspace.getConfiguration("vscode-office")) {
+    private getMarkdownTelemetryProps(configuration = vscode.workspace.getConfiguration("kieran-document-studio")) {
         return {
             editorTheme: String(configuration.get<string>("editorTheme", "Auto")),
             codeTheme: String(configuration.get<string>("codeMirrorTheme", "Auto")),
@@ -75,11 +75,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         MarkdownEditorProvider.configSyncRegistered = true;
         context.subscriptions.push(
             vscode.workspace.onDidChangeConfiguration((event) => {
-                const config = vscode.workspace.getConfiguration('vscode-office');
+                const config = vscode.workspace.getConfiguration('kieran-document-studio');
                 const patch: Partial<Record<MarkdownSyncConfigKey, unknown>> = {};
                 let changed = false;
                 for (const key of MARKDOWN_SYNC_CONFIG_KEYS) {
-                    if (event.affectsConfiguration(`vscode-office.${key}`)) {
+                    if (event.affectsConfiguration(`kieran-document-studio.${key}`)) {
                         patch[key] = config.get(key);
                         changed = true;
                     }
@@ -197,7 +197,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
             // re-parsing on every keystroke (ANTLR token recognition errors in console).
             documentSyncTimer = setTimeout(() => void flushDocumentSync(), 400);
         };
-        const config = vscode.workspace.getConfiguration("vscode-office");
+        const config = vscode.workspace.getConfiguration("kieran-document-studio");
         registerMarkdownWebview(uri, handler);
         handler.panel.onDidDispose(() => {
             void flushDocumentSync();
@@ -310,11 +310,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }).on('developerTool', () => {
             vscode.commands.executeCommand('workbench.action.toggleDevTools')
         }).on('openAbout', () => {
-        }).on('openSponsor', () => {
-            vscode.commands.executeCommand(
-                'workbench.extensions.action.showExtensionsWithIds',
-                ['cweijan.vscode-database-client2'],
-            );
+            void vscode.env.openExternal(vscode.Uri.parse('https://github.com/Chihang03/vscode-office'));
         }).on('openExternal', (url: string) => {
             if (url) {
                 vscode.env.openExternal(vscode.Uri.parse(url));

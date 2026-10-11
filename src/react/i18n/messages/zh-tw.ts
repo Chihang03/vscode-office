@@ -10,7 +10,7 @@ export default {
         close: '關閉',
         delete: '刪除',
         loading: '載入中...',
-        officeViewer: 'Office 檢視器',
+        officeViewer: 'Kieran Document Studio',
         switchToLight: '切換至淺色模式',
         switchToDark: '切換至自適應深色模式',
         editInVscode: '在 VS Code 中編輯',

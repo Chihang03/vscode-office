@@ -46,7 +46,7 @@ export class CustomVariableDiagnosticsProvider {
 
     private queueAll(event?: ConfigurationChangeEvent) {
         workspace.textDocuments
-            .filter(document => event === undefined || event.affectsConfiguration('vscode-office', document.uri))
+            .filter(document => event === undefined || event.affectsConfiguration('kieran-document-studio', document.uri))
             .forEach(document => this.queue(document));
     }
 

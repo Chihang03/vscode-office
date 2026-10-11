@@ -39,7 +39,7 @@ export function createDecompileJavaUri(classPath: string): Uri {
         // ignore
     }
     return Uri.file(javaPath).with({
-        scheme: 'decompile_java',
+        scheme: 'kieran-document-studio-java',
         query: mtimeMs > 0 ? mtimeMs.toString() : undefined,
     });
 }

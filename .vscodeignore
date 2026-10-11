@@ -25,3 +25,13 @@ yarn.lock
 pnpm-lock.yaml
 pnpm-workspace.yaml
 !package.nls*.json
+scripts/**
+.github/**
+docs/**
+image/README*/**
+image/logo.png
+resource/sponsor/**
+eslint.config.mjs
+vite.config.ts
+build.ts
+package-lock.json
