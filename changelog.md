@@ -1,3 +1,20 @@
+# Kieran Document Studio
+
+## 0.1.0 — independent community fork
+
+- Use independent publisher `chihang03` and extension ID `chihang03.kieran-document-studio`.
+- Introduce an original product icon and explicit maintainer/upstream attribution.
+- Isolate command, custom editor, configuration and theme namespaces; see `docs/migration.md`.
+- Remove inherited author/sponsorship claims and the upstream telemetry connection.
+- Remove the inherited migration that deleted shared VS Code WebStorage.
+- Retain upstream MIT copyright, source history and third-party notices.
+
+## Upstream history (retained)
+
+The entries below describe the inherited Office Viewer project. Their versions are not Kieran Document Studio releases.
+
+---
+
 # Change log
 
 # 4.2.0 2026-8-16

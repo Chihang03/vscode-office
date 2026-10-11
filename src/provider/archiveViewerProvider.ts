@@ -19,7 +19,7 @@ export class ArchiveViewerProvider implements vscode.CustomReadonlyEditorProvide
 	constructor(private context: vscode.ExtensionContext) { }
 
 	bindCustomEditor(viewOption: { webviewOptions: vscode.WebviewPanelOptions }) {
-		return vscode.window.registerCustomEditorProvider('cweijan.archiveViewer', this, viewOption);
+		return vscode.window.registerCustomEditorProvider('kieranDocumentStudio.archiveViewer', this, viewOption);
 	}
 
 	public openCustomDocument(uri: vscode.Uri, _openContext: vscode.CustomDocumentOpenContext, _token: vscode.CancellationToken): vscode.CustomDocument {

@@ -3,10 +3,10 @@ import { env, ExtensionContext, workspace } from 'vscode';
 import { fileTypeFromPath, resolveOfficeViewType } from './officeViewType';
 
 /**
- * Application Insights connection string.
- * See docs/telemetry.md for Azure setup steps.
+ * No telemetry endpoint is configured for this independent fork.
+ * See docs/telemetry.md for the disabled reporting policy.
  */
-const TELEMETRY_CONNECTION_STRING = 'InstrumentationKey=49047faa-e1fe-4428-90b7-d4a3730299d8;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=3b475201-7779-41cb-bce0-8a05b81e3c21';
+const TELEMETRY_CONNECTION_STRING = '';
 
 export class TelemetryService {
     private static instance: TelemetryService | undefined;
@@ -37,7 +37,7 @@ export class TelemetryService {
         if (!this.reporter || !env.isTelemetryEnabled) {
             return false;
         }
-        return workspace.getConfiguration('vscode-office').get<boolean>('enableTelemetry', true);
+        return workspace.getConfiguration('kieran-document-studio').get<boolean>('enableTelemetry', false);
     }
 
     private getCommonProperties(): Record<string, string> {

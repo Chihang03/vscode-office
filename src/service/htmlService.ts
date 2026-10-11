@@ -21,7 +21,7 @@ export class HtmlService {
         TelemetryService.get()?.trackViewOpen('previewHtml', fileTypeFromPath(uri.fsPath));
         const folderUri = Uri.joinPath(uri, '..');
         const webviewPanel = window.createWebviewPanel(
-            "office-viewer.viewHtml", basename(uri.fsPath),
+            "kieranDocumentStudio.viewHtml", basename(uri.fsPath),
             { viewColumn: ViewColumn.Two, preserveFocus: true },
             {
                 retainContextWhenHidden: true,

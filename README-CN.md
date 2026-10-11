@@ -1,6 +1,11 @@
-# Office Viewer
+# Kieran Document Studio（文档工作台）
 
 [English](README.md) | 简体中文 | [繁體中文](README-TW.md)
+
+
+由 **Kieran Dai（GitHub：Chihang03；发布者：chihang03）** 独立维护。本项目是基于 [cweijan/vscode-office](https://github.com/cweijan/vscode-office) 的**社区 fork**，不代表上游作者，也未获得上游或 Microsoft 的官方背书。原版权、MIT 许可证和 Git 历史继续保留，来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+独立扩展 ID 为 **`chihang03.kieran-document-studio`**，预览版本从 **0.1.0** 起单独维护。它作为单独扩展安装，不会覆盖 `cweijan.vscode-office`。可从本仓库构建 VSIX；后续发行包将在 [Releases](https://github.com/Chihang03/vscode-office/releases) 提供。品牌整改不表示已经通过 Marketplace 审核。设置、命令和自定义编辑器均使用独立命名空间，旧配置迁移见[迁移说明](docs/migration.md)。
 
 ## 介绍
 
@@ -21,9 +26,8 @@
 
 ## Git 历史
 
-Office Viewer 内置完整的 Git 历史工作区，让你无需离开 VS Code 即可浏览仓库。可从源代码管理视图、编辑器标题栏、编辑器右键菜单或文件资源管理器右键菜单打开。
+Kieran Document Studio 内置完整的 Git 历史工作区，让你无需离开 VS Code 即可浏览仓库。可从源代码管理视图、编辑器标题栏、编辑器右键菜单或文件资源管理器右键菜单打开。
 
-![1783342874748](image/README/1783342874748.png)
 
 ## Markdown
 
@@ -40,9 +44,8 @@ Office Viewer 内置完整的 Git 历史工作区，让你无需离开 VS Code �
 }
 ```
 
-在编辑器中右键，可将 Markdown 导出为 PDF、DOCX 或 HTML。PDF 导出依赖 Chromium，可通过 `vscode-office.chromiumPath` 配置浏览器路径。
+在编辑器中右键，可将 Markdown 导出为 PDF、DOCX 或 HTML。PDF 导出依赖 Chromium，可通过 `kieran-document-studio.chromiumPath` 配置浏览器路径。
 
-![导出 Markdown](image/README-CN/1685418034035.png)
 
 快捷键：基于 [shortcut.md](shortcut.md)，以及：
 
@@ -57,28 +60,22 @@ Office Viewer 内置完整的 Git 历史工作区，让你无需离开 VS Code �
 
 - HTML: 编辑时按下 `Ctrl+Shift+V` 可实时预览
 - YAML: 支持文档大纲与锚点导航（别名引用可跳转到定义）
-- 图标主题: 内置 [Material Icon Theme](https://github.com/PKief/vscode-material-icon-theme) 部分图标，并提供 **Office Material Icon Theme** 与 **One Dark Modern** 配色主题
+- 图标主题: 内置 [Material Icon Theme](https://github.com/PKief/vscode-material-icon-theme) 部分图标，并提供 **Material Icons (Kieran Document Studio)** 与 **One Dark Modern (Kieran Document Studio)** 配色主题
 - Excel: 支持预览和保存 `.xlsx`、`.xls`、`.xlsm`、`.csv`、`.ods` 等文件
 - HTTP: 在 `.http`、`.rest` 文件中发送请求（集成自 [REST Client](https://github.com/Huachao/vscode-restclient)，并修复了本地请求的已知问题）；按 `Ctrl+Enter` / `⌘ Enter` 发送
 - Java: 打开 `.class` 文件可反编译并查看源码
-
-## Sponsor
-
-[![Database Client](https://doc.database-client.com/public/logo.png)](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2)
-
-适用于 Visual Studio Code 的数据库客户端，支持 **MySQL/MariaDB、PostgreSQL、SQLite、Redis** 以及 **ElasticSearch** 等数据库的管理，且可作为一个 SSH 客户端，极大地提升您的生产力！[立刻安装](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2)。
 
 ## 开发指南
 
 ### 环境要求
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 24（已验证的构建与打包环境）
 - [VS Code](https://code.visualstudio.com/) 1.64+
 
 ### 快速开始
 
 ```bash
-git clone https://github.com/cweijan/vscode-office.git
+git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
 npm install
 ```
@@ -108,30 +105,11 @@ npm run build    # 生产构建
 npm run package  # 生成 .vsix
 ```
 
-## 使用数据（Usage Data）
+## 使用数据
 
-Office Viewer 会收集**匿名使用数据**，用于了解各预览功能的使用情况，以便改进扩展。数据通过官方模块 [`@vscode/extension-telemetry`](https://www.npmjs.com/package/@vscode/extension-telemetry) 发送至 [Azure Application Insights](https://learn.microsoft.com/zh-cn/azure/azure-monitor/app/app-insights-overview)。
+此社区 fork **不配置遥测接收端，也不发送扩展使用事件**。继承的 Application Insights 连接已移除。保留的 `kieran-document-studio.enableTelemetry` 设置默认为 `false`；本构建中将它设为 `true` 也不会开启上报。维护说明见 [docs/telemetry.md](docs/telemetry.md)。
 
-### 收集内容
-
-| 事件 | 触发时机 | 属性 |
-|------|---------|------|
-| `view.open` | 打开自定义预览/编辑器 | `viewType`（如 `excel`、`markdown`、`pdf`）、`fileType`（仅扩展名，如 `xlsx`、`md`） |
-
-**不会**收集文件路径、文件名、URL、仓库名、请求内容或其他可识别个人身份的信息。
-
-### 如何关闭
-
-仅在以下**两项均允许**时才会上报：
-
-1. VS Code 全局遥测已开启（`telemetry.telemetryLevel` 不为 `off`，或旧版中 `telemetry.enableTelemetry` 为 `true`）。
-2. 扩展遥测已开启：在设置中将 `vscode-office.enableTelemetry` 设为 `false` 可单独关闭本扩展的上报。
-
-也可在 **设置 → 应用程序 → 遥测** 中关闭 VS Code 的全部遥测。
-
-### 维护者配置
-
-若自行构建并发布本扩展，请参阅 [docs/telemetry.md](docs/telemetry.md) 配置 Azure Application Insights 及示例查询。
+主动执行 HTTP 请求、加载文档中的远程资源和使用 AI 功能，仍会访问各自配置的服务；这些功能与扩展使用遥测分开处理。
 
 ## Credits
 

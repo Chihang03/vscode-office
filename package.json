@@ -1,10 +1,10 @@
 {
-	"name": "vscode-office",
-	"displayName": "Office Viewer",
-	"description": "View word, excel, powerpoint files and using WYSIWYG editor for markdown.",
-	"version": "4.2.0",
-	"publisher": "cweijan",
-	"icon": "image/logo.png",
+	"name": "kieran-document-studio",
+	"displayName": "Kieran Document Studio（文档工作台）",
+	"description": "Kieran Dai 独立维护的社区 fork：在 VS Code 中查看办公文档、编辑 Markdown，并浏览 Git 历史。",
+	"version": "0.1.0",
+	"publisher": "chihang03",
+	"icon": "image/kieran-document-studio.png",
 	"engines": {
 		"vscode": "^1.64.0"
 	},
@@ -38,13 +38,12 @@
 		"Other"
 	],
 	"bugs": {
-		"url": "https://github.com/cweijan/vscode-office/issues",
-		"email": "cweijan@163.com"
+		"url": "https://github.com/Chihang03/vscode-office/issues"
 	},
-	"homepage": "https://github.com/cweijan/vscode-office/blob/master/README.md",
+	"homepage": "https://github.com/Chihang03/vscode-office",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cweijan/vscode-office.git"
+		"url": "https://github.com/Chihang03/vscode-office.git"
 	},
 	"activationEvents": [
 		"onStartupFinished"
@@ -54,20 +53,20 @@
 	"contributes": {
 		"themes": [
 			{
-				"label": "One Dark Modern",
+				"label": "One Dark Modern (Kieran Document Studio)",
 				"uiTheme": "vs-dark",
 				"path": "./theme/onedark-modern.json"
 			},
 			{
-				"label": "One Dark Modern Classic",
+				"label": "One Dark Modern Classic (Kieran Document Studio)",
 				"uiTheme": "vs-dark",
 				"path": "./theme/onedark-modern-classic.json"
 			}
 		],
 		"iconThemes": [
 			{
-				"id": "office-material-icon-theme",
-				"label": "Material Icon Theme (Office Viewer)",
+				"id": "kieran-document-studio-material-icons",
+				"label": "Material Icons (Kieran Document Studio)",
 				"path": "./theme/material-icons.json",
 				"_watch": true
 			}
@@ -201,167 +200,176 @@
 		],
 		"commands": [
 			{
-				"command": "vscode-office.save-response-body",
+				"command": "kieranDocumentStudio.save-response-body",
 				"title": "Save Response",
 				"icon": "$(save)",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "vscode-office.copy-response-body",
+				"command": "kieranDocumentStudio.copy-response-body",
 				"title": "Copy Response",
 				"icon": "$(copy)",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.markdown.switch",
+				"command": "kieranDocumentStudio.markdown.switch",
 				"title": "Switch markdown editor",
-				"icon": "$(edit)"
+				"icon": "$(edit)",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.csv.switch",
+				"command": "kieranDocumentStudio.csv.switch",
 				"title": "Switch CSV editor",
-				"icon": "$(edit)"
+				"icon": "$(edit)",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.markdown.paste",
+				"command": "kieranDocumentStudio.markdown.paste",
 				"title": "Enhance paste in markdown",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.html.preview",
-				"title": "Preview HTML"
+				"command": "kieranDocumentStudio.html.preview",
+				"title": "Preview HTML",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.gitHistory.view",
+				"command": "kieranDocumentStudio.gitHistory.view",
 				"title": "View Git History",
 				"icon": "$(history)",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.gitHistory.viewFileHistory",
+				"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
 				"title": "Git: View File History",
 				"icon": "$(git-commit)",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			},
 			{
-				"command": "office.gitHistory.quickSync",
+				"command": "kieranDocumentStudio.gitHistory.quickSync",
 				"title": "Git: Quick Sync",
 				"icon": "$(sync)",
-				"enablement": "!office.extensionHost.web"
+				"enablement": "!kieranDocumentStudio.extensionHost.web",
+				"category": "Kieran Document Studio"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "office.markdown.paste",
+				"command": "kieranDocumentStudio.markdown.paste",
 				"key": "ctrl+v",
 				"mac": "cmd+v",
-				"when": "editorTextFocus && resourceLangId == markdown && !office.extensionHost.web"
+				"when": "editorTextFocus && resourceLangId == markdown && !kieranDocumentStudio.extensionHost.web"
 			},
 			{
-				"command": "office.html.preview",
+				"command": "kieranDocumentStudio.html.preview",
 				"key": "ctrl+shift+v",
 				"when": "editorTextFocus && editorLangId == html"
 			},
 			{
-				"command": "office.markdown.switch",
+				"command": "kieranDocumentStudio.markdown.switch",
 				"key": "ctrl+alt+e",
 				"mac": "ctrl+cmd+e",
 				"when": "editorTextFocus && editorLangId == markdown"
 			},
 			{
-				"command": "vscode-office.request",
+				"command": "kieranDocumentStudio.request",
 				"key": "ctrl+enter",
 				"mac": "cmd+enter",
-				"when": "editorTextFocus && editorLangId == 'http' && !office.extensionHost.web"
+				"when": "editorTextFocus && editorLangId == 'http' && !kieranDocumentStudio.extensionHost.web"
 			}
 		],
 		"menus": {
 			"scm/title": [
 				{
-					"command": "office.gitHistory.view",
+					"command": "kieranDocumentStudio.gitHistory.view",
 					"group": "navigation",
-					"when": "scmProvider == git && !office.extensionHost.web"
+					"when": "scmProvider == git && !kieranDocumentStudio.extensionHost.web"
 				},
 				{
-					"command": "office.gitHistory.quickSync",
+					"command": "kieranDocumentStudio.gitHistory.quickSync",
 					"group": "navigation",
-					"when": "scmProvider == git && config.vscode-office.gitHistory.quickSyncButton && !office.extensionHost.web"
+					"when": "scmProvider == git && config.kieran-document-studio.gitHistory.quickSyncButton && !kieranDocumentStudio.extensionHost.web"
 				}
 			],
 			"scm/repository": [
 				{
-					"command": "office.gitHistory.view",
+					"command": "kieranDocumentStudio.gitHistory.view",
 					"group": "navigation",
-					"when": "scmProvider == git && !office.extensionHost.web"
+					"when": "scmProvider == git && !kieranDocumentStudio.extensionHost.web"
 				}
 			],
 			"scm/resourceState/context": [
 				{
-					"command": "office.gitHistory.viewFileHistory",
-					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && !office.extensionHost.web"
+					"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
+					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && !kieranDocumentStudio.extensionHost.web"
 				}
 			],
 			"editor/title": [
 				{
-					"command": "office.gitHistory.viewFileHistory",
+					"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
 					"group": "navigation@4",
-					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !office.extensionHost.web"
+					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !kieranDocumentStudio.extensionHost.web"
 				},
 				{
-					"command": "office.markdown.switch",
+					"command": "kieranDocumentStudio.markdown.switch",
 					"when": "resourceExtname == '.md'",
 					"group": "navigation@-2"
 				},
 				{
-					"command": "office.csv.switch",
+					"command": "kieranDocumentStudio.csv.switch",
 					"when": "resourceExtname == '.csv' || resourceExtname == '.tsv'",
 					"group": "navigation@-2"
 				},
 				{
-					"when": "editorTextFocus && resourceScheme == rest-client-response",
-					"command": "vscode-office.copy-response-body",
+					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response",
+					"command": "kieranDocumentStudio.copy-response-body",
 					"group": "navigation@0"
 				},
 				{
-					"when": "editorTextFocus && resourceScheme == rest-client-response",
-					"command": "vscode-office.save-response-body",
+					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response",
+					"command": "kieranDocumentStudio.save-response-body",
 					"group": "navigation@2"
 				}
 			],
 			"editor/context": [
 				{
-					"command": "office.gitHistory.viewFileHistory",
+					"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
 					"group": "git",
-					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !office.extensionHost.web"
+					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !kieranDocumentStudio.extensionHost.web"
 				},
 				{
-					"command": "office.html.preview",
+					"command": "kieranDocumentStudio.html.preview",
 					"group": "navigation@1",
 					"when": "editorTextFocus && editorLangId == html"
 				},
 				{
-					"command": "vscode-office.save-response-body",
+					"command": "kieranDocumentStudio.save-response-body",
 					"group": "http@2",
-					"when": "editorTextFocus && resourceScheme == rest-client-response && !office.extensionHost.web"
+					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response && !kieranDocumentStudio.extensionHost.web"
 				},
 				{
-					"command": "vscode-office.copy-response-body",
+					"command": "kieranDocumentStudio.copy-response-body",
 					"group": "http@4",
-					"when": "editorTextFocus && resourceScheme == rest-client-response && !office.extensionHost.web"
+					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response && !kieranDocumentStudio.extensionHost.web"
 				}
 			],
 			"explorer/context": [
 				{
-					"command": "office.gitHistory.viewFileHistory",
+					"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
 					"group": "git",
-					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !office.extensionHost.web"
+					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !kieranDocumentStudio.extensionHost.web"
 				}
 			]
 		},
 		"customEditors": [
 			{
-				"viewType": "cweijan.officeViewer",
-				"displayName": "Office Viewer",
+				"viewType": "kieranDocumentStudio.officeViewer",
+				"displayName": "Kieran Document Studio: Documents",
 				"selector": [
 					{
 						"filenamePattern": "*.xls"
@@ -450,8 +458,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.archiveViewer",
-				"displayName": "Archive Viewer",
+				"viewType": "kieranDocumentStudio.archiveViewer",
+				"displayName": "Kieran Document Studio: Archive Viewer",
 				"selector": [
 					{
 						"filenamePattern": "*.jar"
@@ -486,8 +494,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.imageViewer",
-				"displayName": "Image Preview (Office Viewer)",
+				"viewType": "kieranDocumentStudio.imageViewer",
+				"displayName": "Kieran Document Studio: Image Preview",
 				"priority": "option",
 				"selector": [
 					{
@@ -529,8 +537,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.markdownViewer",
-				"displayName": "Markdown Editor",
+				"viewType": "kieranDocumentStudio.markdownViewer",
+				"displayName": "Kieran Document Studio: Markdown Editor",
 				"selector": [
 					{
 						"filenamePattern": "file:/**/*.md"
@@ -553,8 +561,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.htmlViewer",
-				"displayName": "Html Viewer",
+				"viewType": "kieranDocumentStudio.htmlViewer",
+				"displayName": "Kieran Document Studio: HTML Viewer",
 				"priority": "option",
 				"selector": [
 					{
@@ -569,8 +577,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.parquetViewer",
-				"displayName": "Parquet Viewer",
+				"viewType": "kieranDocumentStudio.parquetViewer",
+				"displayName": "Kieran Document Studio: Parquet Viewer",
 				"priority": "option",
 				"selector": [
 					{
@@ -579,8 +587,8 @@
 				]
 			},
 			{
-				"viewType": "cweijan.classViewer",
-				"displayName": "Java Decompiler",
+				"viewType": "kieranDocumentStudio.classViewer",
+				"displayName": "Kieran Document Studio: Java Decompiler",
 				"selector": [
 					{
 						"filenamePattern": "file:/**/*.class"
@@ -593,7 +601,7 @@
 				"title": "Git History",
 				"order": 98,
 				"properties": {
-					"vscode-office.gitHistory.quickSyncButton": {
+					"kieran-document-studio.gitHistory.quickSyncButton": {
 						"type": "boolean",
 						"default": false,
 						"description": "Show Quick Sync button in Source Control (Git) title toolbar."
@@ -604,7 +612,7 @@
 				"title": "Markdown",
 				"order": 1,
 				"properties": {
-					"vscode-office.editorTheme": {
+					"kieran-document-studio.editorTheme": {
 						"type": "string",
 						"enum": [
 							"Auto",
@@ -621,7 +629,7 @@
 						"default": "Auto",
 						"markdownDescription": "The theme for the Markdown editor."
 					},
-					"vscode-office.codeMirrorTheme": {
+					"kieran-document-studio.codeMirrorTheme": {
 						"type": "string",
 						"enum": [
 							"Auto",
@@ -639,7 +647,7 @@
 						"default": "Auto",
 						"markdownDescription": "CodeMirror syntax theme for code blocks in the Markdown editor."
 					},
-					"vscode-office.mermaidTheme": {
+					"kieran-document-studio.mermaidTheme": {
 						"type": "string",
 						"enum": [
 							"Auto",
@@ -655,7 +663,7 @@
 						"default": "Auto",
 						"markdownDescription": "Mermaid diagram theme in the Markdown editor. Auto follows the editor theme."
 					},
-					"vscode-office.editMode": {
+					"kieran-document-studio.editMode": {
 						"type": "string",
 						"enum": [
 							"wysiwyg",
@@ -664,22 +672,22 @@
 						"default": "wysiwyg",
 						"markdownDescription": "Default edit mode for the Markdown editor."
 					},
-					"vscode-office.restoreViewState": {
+					"kieran-document-studio.restoreViewState": {
 						"type": "boolean",
 						"default": true,
 						"markdownDescription": "Restore caret focus when opening a Markdown file. Scroll position is always restored."
 					},
-					"vscode-office.workspacePathAsImageBasePath": {
+					"kieran-document-studio.workspacePathAsImageBasePath": {
 						"type": "boolean",
 						"default": false,
 						"description": "Using workspace path as markdown image base path."
 					},
-					"vscode-office.pasteImageToWorkspacePath": {
+					"kieran-document-studio.pasteImageToWorkspacePath": {
 						"type": "boolean",
 						"default": false,
 						"description": "Paste markdown images into the workspace path and insert image links with a leading slash."
 					},
-					"vscode-office.pasterImgPath": {
+					"kieran-document-studio.pasterImgPath": {
 						"type": "string",
 						"default": "image/${fileName}/${now}.${ext}",
 						"description": "Markdown paste image path, variables: workspaceDir, fileName, now, date (YYYYMMDD), uuid, ext (file extension)."
@@ -690,11 +698,11 @@
 				"title": "Markdown PDF",
 				"order": 2,
 				"properties": {
-					"vscode-office.chromiumPath": {
+					"kieran-document-studio.chromiumPath": {
 						"type": "string",
 						"description": "Set the chromium browser location for exporting markdown pdf."
 					},
-					"vscode-office.puppeteerArgs": {
+					"kieran-document-studio.puppeteerArgs": {
 						"type": "array",
 						"items": {
 							"type": "string"
@@ -702,7 +710,7 @@
 						"default": [],
 						"description": "Additional arguments to pass to Puppeteer/Chromium when exporting PDF. Example: [\"--no-sandbox\", \"--disable-setuid-sandbox\"] for Linux servers running as root."
 					},
-					"vscode-office.pdfMarginTop": {
+					"kieran-document-studio.pdfMarginTop": {
 						"type": "integer",
 						"default": 25,
 						"description": "Printed pdf default top margin."
@@ -713,13 +721,13 @@
 				"title": "HTTP Client",
 				"order": 3,
 				"properties": {
-					"vscode-office.followredirect": {
+					"kieran-document-studio.followredirect": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
 						"description": "Follow HTTP 3xx responses as redirects."
 					},
-					"vscode-office.environmentVariables": {
+					"kieran-document-studio.environmentVariables": {
 						"type": "object",
 						"default": {
 							"$shared": {}
@@ -727,7 +735,7 @@
 						"scope": "resource",
 						"markdownDescription": "Sets the environments and custom variables belongs to it."
 					},
-					"vscode-office.previewOption": {
+					"kieran-document-studio.previewOption": {
 						"type": "string",
 						"enum": [
 							"full",
@@ -739,7 +747,7 @@
 						"scope": "resource",
 						"description": "Response preview output option"
 					},
-					"vscode-office.previewColumn": {
+					"kieran-document-studio.previewColumn": {
 						"type": "string",
 						"enum": [
 							"current",
@@ -749,7 +757,7 @@
 						"scope": "resource",
 						"description": "Response preview column option"
 					},
-					"vscode-office.formParamEncodingStrategy": {
+					"kieran-document-studio.formParamEncodingStrategy": {
 						"type": "string",
 						"enum": [
 							"automatic",
@@ -760,19 +768,19 @@
 						"scope": "resource",
 						"description": "Form param encoding strategy for x-www-form-urlencoded body"
 					},
-					"vscode-office.addRequestBodyLineIndentationAroundBrackets": {
+					"kieran-document-studio.addRequestBodyLineIndentationAroundBrackets": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
 						"description": "Add line indentation around brackets in request body"
 					},
-					"vscode-office.decodeEscapedUnicodeCharacters": {
+					"kieran-document-studio.decodeEscapedUnicodeCharacters": {
 						"type": "boolean",
 						"default": false,
 						"scope": "resource",
 						"description": "Decode escaped unicode characters in response body."
 					},
-					"vscode-office.logLevel": {
+					"kieran-document-studio.logLevel": {
 						"type": "string",
 						"enum": [
 							"error",
@@ -784,7 +792,7 @@
 						"scope": "resource",
 						"description": "The verbosity of logging in the REST output panel"
 					},
-					"vscode-office.enableCustomVariableReferencesCodeLens": {
+					"kieran-document-studio.enableCustomVariableReferencesCodeLens": {
 						"type": "boolean",
 						"default": true,
 						"scope": "resource",
@@ -796,14 +804,14 @@
 				"title": "Telemetry",
 				"order": 99,
 				"properties": {
-					"vscode-office.enableTelemetry": {
+					"kieran-document-studio.enableTelemetry": {
 						"type": "boolean",
-						"default": true,
+						"default": false,
 						"tags": [
 							"telemetry",
 							"usesOnlineServices"
 						],
-						"markdownDescription": "Enable anonymous usage data collection to help improve Office Viewer. This respects VS Code global telemetry settings (`#telemetry.telemetryLevel#`)."
+						"markdownDescription": "Reserved for maintainer-controlled telemetry. This community fork ships without a telemetry endpoint and sends no extension usage events, even when this setting is enabled."
 					}
 				}
 			}
@@ -814,9 +822,9 @@
 		"dev:web": "OFFICE_EXTENSION_TARGET=web vite --mode=development",
 		"lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
 		"build": "vite build --mode=production",
-		"package": "vsce package --no-dependencies",
-		"publish": "vsce publish --no-dependencies && ovsx publish --no-dependencies",
-		"vscode:prepublish": "npm run build"
+		"package": "vsce package --no-dependencies --githubBranch main",
+		"vscode:prepublish": "npm run check:identity && npm run build",
+		"check:identity": "node scripts/check-identity.cjs"
 	},
 	"devDependencies": {
 		"@types/diff-match-patch": "1.0.32",
@@ -827,6 +835,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.62.1",
 		"@typescript-eslint/parser": "^8.62.1",
 		"@vitejs/plugin-react": "^6.0.2",
+		"@vscode/vsce": "4.0.0",
 		"chokidar": "^5.0.0",
 		"esbuild": "^0.28.1",
 		"esbuild-plugin-copy": "2.1.1",
@@ -914,5 +923,10 @@
 		"vscode-html-to-docx": "^1.1.3",
 		"xlsx": "^0.18.5",
 		"yaml": "^2.9.0"
-	}
+	},
+	"author": {
+		"name": "Kieran Dai"
+	},
+	"license": "MIT",
+	"preview": true
 }

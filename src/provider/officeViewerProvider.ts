@@ -19,10 +19,10 @@ export class OfficeViewerProvider implements vscode.CustomReadonlyEditorProvider
 
 	bindCustomEditors(viewOption: { webviewOptions: vscode.WebviewPanelOptions }) {
 		return [
-			vscode.window.registerCustomEditorProvider('cweijan.officeViewer', this, viewOption),
-			vscode.window.registerCustomEditorProvider('cweijan.htmlViewer', this, viewOption),
-			vscode.window.registerCustomEditorProvider('cweijan.imageViewer', this, viewOption),
-			vscode.window.registerCustomEditorProvider('cweijan.parquetViewer', this, viewOption),
+			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.officeViewer', this, viewOption),
+			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.htmlViewer', this, viewOption),
+			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.imageViewer', this, viewOption),
+			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.parquetViewer', this, viewOption),
 		];
 	}
 

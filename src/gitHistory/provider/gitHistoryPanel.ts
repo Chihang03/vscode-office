@@ -17,7 +17,7 @@ import {
     type FileHistorySplitLayout,
 } from '../util/gitHistoryPreferences';
 
-export const GIT_HISTORY_VIEW_TYPE = 'office-git-history';
+export const GIT_HISTORY_VIEW_TYPE = 'kieran-document-studio-git-history';
 
 function isCursorApp(): boolean {
     return /Cursor/i.test(vscode.env.appName);

@@ -71,14 +71,14 @@ class ResponseContentProvider implements TextDocumentContentProvider {
 export class HttpResponseView {
     private readonly settings = RestClientSettings.Instance;
     private readonly contentProvider = new ResponseContentProvider();
-    private readonly scheme = 'rest-client-response';
+    private readonly scheme = 'kieran-document-studio-response';
     private readonly responseUri = Uri.parse(`${this.scheme}://response/Response`);
     private currentResponse?: HttpResponse;
 
     public constructor() {
         workspace.registerTextDocumentContentProvider(this.scheme, this.contentProvider);
-        commands.registerCommand('vscode-office.copy-response-body', () => this.copyBody());
-        commands.registerCommand('vscode-office.save-response-body', () => this.saveBody());
+        commands.registerCommand('kieranDocumentStudio.copy-response-body', () => this.copyBody());
+        commands.registerCommand('kieranDocumentStudio.save-response-body', () => this.saveBody());
     }
 
     public async render(response: HttpResponse, column?: ViewColumn) {

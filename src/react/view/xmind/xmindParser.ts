@@ -311,7 +311,7 @@ function createXmindDocument(
                 return mindDataToXmindSheet(source, sheet, restoreImageUrl);
             });
             zip.file('content.json', JSON.stringify(content));
-            zip.file('metadata.json', JSON.stringify({ creator: { name: 'Office Viewer' } }));
+            zip.file('metadata.json', JSON.stringify({ creator: { name: 'Kieran Document Studio' } }));
             zip.file('manifest.json', JSON.stringify({
                 'file-entries': {
                     'content.json': {},
