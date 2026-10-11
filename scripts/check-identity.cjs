@@ -10,6 +10,10 @@ assert.equal(pkg.repository.url, 'https://github.com/Chihang03/vscode-office.git
 assert.equal(pkg.bugs.url, 'https://github.com/Chihang03/vscode-office/issues');
 assert.ok(fs.existsSync(path.join(root, pkg.icon)), 'independent icon exists');
 assert.ok(!pkg.scripts.publish, 'no inherited one-step registry publish script');
+assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /<title>Kieran Document Studio<\/title>/);
+for (const theme of pkg.contributes.themes) {
+    assert.equal(JSON.parse(fs.readFileSync(path.join(root, theme.path), 'utf8')).name, theme.label);
+}
 for (const command of pkg.contributes.commands) {
     assert.ok(command.command.startsWith('kieranDocumentStudio.'), command.command);
     assert.equal(command.category, 'Kieran Document Studio');

@@ -55,7 +55,8 @@
     scrollbar-color: var(--vscode-scrollbarSlider-background, #c9d1d9) var(--git-graph-bg);
 }
 
-body[data-vscode-theme-id="One Dark Modern"] .git-graph:not(.git-graph-light) {
+body[data-vscode-theme-id="One Dark Modern"] .git-graph:not(.git-graph-light),
+body[data-vscode-theme-id="One Dark Modern (Kieran Document Studio)"] .git-graph:not(.git-graph-light) {
     --git-graph-primary-btn-bg: #4d78cc !important;
     --git-graph-primary-btn-bg-hover: #5a86e0 !important;
     --git-graph-primary-btn-fg: #ffffff !important;
