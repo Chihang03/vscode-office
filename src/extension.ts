@@ -35,6 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const markdownEditorProvider = new MarkdownEditorProvider(context)
 	context.subscriptions.push(
 		vscode.commands.registerCommand('kieranDocumentStudio.markdown.switch', (uri) => { markdownService.switchEditor(uri) }),
+		vscode.commands.registerCommand('kieranDocumentStudio.markdown.exportPdf', (uri) => markdownService.exportMarkdown(uri, { type: 'pdf' })),
 		vscode.commands.registerCommand('kieranDocumentStudio.csv.switch', (uri) => { switchCsvEditor(uri) }),
 		vscode.commands.registerCommand('kieranDocumentStudio.markdown.paste', () => { markdownService.loadClipboardImage() }),
 		vscode.commands.registerCommand('kieranDocumentStudio.html.preview', uri => HtmlService.previewHtml(uri, context)),

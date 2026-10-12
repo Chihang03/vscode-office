@@ -23,5 +23,10 @@
 	"ext.markdown.customAiUrlRequired": "自訂 AI：API URL 為必填項。",
 	"ext.markdown.customAiPolishFailed": "自訂 AI 潤色失敗：$1",
 	"ext.markdown.selectImage": "選擇圖片",
-	"ext.markdown.statusBar": "行 $1 字數 $2"
+	"ext.markdown.statusBar": "行 $1 字數 $2",
+	"ext.markdown.exportPdf": "將 Markdown 匯出為 PDF",
+	"ext.markdown.exportFailed": "Markdown 匯出失敗：$1",
+	"ext.markdown.exportRequiresFile": "請選擇擴充功能執行環境中已儲存的 Markdown 檔案（.md 或 .markdown）進行匯出。",
+	"ext.markdown.exportSaveFailed": "無法儲存 Markdown 檔案，已停止 PDF 匯出。",
+	"ext.markdown.openExport": "開啟 PDF"
 }

@@ -173,19 +173,29 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         let lastManualSaveTime: number;
         let documentSyncTimer: ReturnType<typeof setTimeout> | undefined;
         let pendingDocumentSync: string | undefined;
+        let documentSyncTask: Promise<unknown> = Promise.resolve();
         const flushDocumentSync = async () => {
             if (documentSyncTimer) {
                 clearTimeout(documentSyncTimer);
                 documentSyncTimer = undefined;
             }
             if (pendingDocumentSync === undefined) {
+                await documentSyncTask;
                 return;
             }
             const nextContent = pendingDocumentSync;
             pendingDocumentSync = undefined;
             content = nextContent;
-            await this.updateTextDocument(document, nextContent);
+            documentSyncTask = documentSyncTask.then(() => this.updateTextDocument(document, nextContent));
+            await documentSyncTask;
         };
+        const exportPreparation = Holder.registerExportPreparation(uri, async () => {
+            await flushDocumentSync();
+            if (await documentSyncTask === false) {
+                throw new Error(i18n('ext.markdown.exportSaveFailed'));
+            }
+        });
+        handler.panel.onDidDispose(() => exportPreparation.dispose());
         const scheduleDocumentSync = (newContent: string) => {
             pendingDocumentSync = newContent;
             content = newContent;
@@ -304,9 +314,8 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
             await flushDocumentSync();
             this.updateCount(content);
             vscode.commands.executeCommand('workbench.action.files.save');
-        }).on("export", (option) => {
-            vscode.commands.executeCommand('workbench.action.files.save');
-            new MarkdownService(this.context).exportMarkdown(uri, option)
+        }).on("export", async (option) => {
+            await new MarkdownService(this.context).exportMarkdown(uri, option);
         }).on('developerTool', () => {
             vscode.commands.executeCommand('workbench.action.toggleDevTools')
         }).on('openAbout', () => {

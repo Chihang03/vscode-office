@@ -2,11 +2,12 @@
 	"name": "kieran-document-studio",
 	"displayName": "Kieran Document Studio（文档工作台）",
 	"description": "Kieran Dai 独立维护的社区 fork：在 VS Code 中查看办公文档、编辑 Markdown，并浏览 Git 历史。",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "chihang03",
 	"icon": "image/kieran-document-studio.png",
 	"engines": {
-		"vscode": "^1.64.0"
+		"vscode": "^1.64.0",
+		"node": ">=22.12.0"
 	},
 	"keywords": [
 		"pdf",
@@ -256,6 +257,13 @@
 				"icon": "$(sync)",
 				"enablement": "!kieranDocumentStudio.extensionHost.web",
 				"category": "Kieran Document Studio"
+			},
+			{
+				"command": "kieranDocumentStudio.markdown.exportPdf",
+				"title": "%ext.markdown.exportPdf%",
+				"category": "Kieran Document Studio",
+				"icon": "$(export)",
+				"enablement": "!kieranDocumentStudio.extensionHost.web"
 			}
 		],
 		"keybindings": [
@@ -334,6 +342,11 @@
 					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response",
 					"command": "kieranDocumentStudio.save-response-body",
 					"group": "navigation@2"
+				},
+				{
+					"command": "kieranDocumentStudio.markdown.exportPdf",
+					"when": "resourceScheme == file && (resourceExtname == .md || resourceExtname == .markdown) && !kieranDocumentStudio.extensionHost.web",
+					"group": "navigation@5"
 				}
 			],
 			"editor/context": [
@@ -356,6 +369,11 @@
 					"command": "kieranDocumentStudio.copy-response-body",
 					"group": "http@4",
 					"when": "editorTextFocus && resourceScheme == kieran-document-studio-response && !kieranDocumentStudio.extensionHost.web"
+				},
+				{
+					"command": "kieranDocumentStudio.markdown.exportPdf",
+					"when": "resourceScheme == file && (resourceExtname == .md || resourceExtname == .markdown) && !kieranDocumentStudio.extensionHost.web",
+					"group": "kieranDocumentStudio@1"
 				}
 			],
 			"explorer/context": [
@@ -363,6 +381,17 @@
 					"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
 					"group": "git",
 					"when": "config.git.enabled && gitOpenRepositoryCount != 0 && resourceScheme == file && !kieranDocumentStudio.extensionHost.web"
+				},
+				{
+					"command": "kieranDocumentStudio.markdown.exportPdf",
+					"when": "resourceScheme == file && (resourceExtname == .md || resourceExtname == .markdown) && !kieranDocumentStudio.extensionHost.web",
+					"group": "kieranDocumentStudio@1"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "kieranDocumentStudio.markdown.exportPdf",
+					"when": "!kieranDocumentStudio.extensionHost.web"
 				}
 			]
 		},
@@ -824,7 +853,9 @@
 		"build": "vite build --mode=production",
 		"package": "vsce package --no-dependencies --githubBranch main",
 		"vscode:prepublish": "npm run check:identity && npm run build",
-		"check:identity": "node scripts/check-identity.cjs"
+		"check:identity": "node scripts/check-identity.cjs",
+		"test:pdf": "node --test test/pdf/export.test.cjs",
+		"test:pdf:smoke": "node test/pdf/smoke.cjs"
 	},
 	"devDependencies": {
 		"@types/diff-match-patch": "1.0.32",

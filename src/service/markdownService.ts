@@ -27,28 +27,65 @@ export class MarkdownService {
      * export markdown to another type
      * @param type pdf, html, docx 
      */
-    public async exportMarkdown(uri: vscode.Uri, option: ExportOption = {}) {
+    public async exportMarkdown(uri?: vscode.Uri, option: ExportOption = {}) {
         const { type = 'pdf' } = option;
         try {
-            if (type != 'html') { // html导出速度快, 无需等待
-                vscode.window.showInformationMessage(i18n('ext.markdown.exportStart', type))
+            uri = uri || vscode.window.activeTextEditor?.document.uri || Holder.activeDocument?.uri;
+            if (!uri || uri.scheme !== 'file' || !/\.(md|markdown)$/i.test(uri.path)) {
+                throw new Error(i18n('ext.markdown.exportRequiresFile'));
             }
-            await convertMd({ markdownFilePath: uri.fsPath, config: this.getConfig(option) })
-            vscode.window.showInformationMessage(i18n('ext.markdown.exportSuccess', type))
+            let outputPath: string | undefined;
+            if (type === 'pdf') {
+                const parsed = parse(uri.fsPath);
+                const target = await vscode.window.showSaveDialog({
+                    defaultUri: vscode.Uri.file(join(parsed.dir, `${parsed.name}.pdf`)),
+                    filters: { PDF: ['pdf'] },
+                    title: i18n('ext.markdown.exportPdf'),
+                });
+                if (!target) return;
+                if (target.scheme !== 'file') {
+                    throw new Error(i18n('ext.markdown.exportRequiresFile'));
+                }
+                outputPath = /\.pdf$/i.test(target.fsPath) ? target.fsPath : `${target.fsPath}.pdf`;
+            }
+            await Holder.prepareExport(uri);
+            const document = await vscode.workspace.openTextDocument(uri);
+            if (document.isDirty && !await document.save()) {
+                throw new Error(i18n('ext.markdown.exportSaveFailed'));
+            }
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: i18n('ext.markdown.exportStart', type.toUpperCase()),
+                cancellable: false,
+            }, () => convertMd({
+                markdownFilePath: uri.fsPath,
+                config: { ...this.getConfig(option), outputPath },
+            }));
+            const openLabel = i18n('ext.markdown.openExport');
+            const action = await vscode.window.showInformationMessage(
+                i18n('ext.markdown.exportSuccess', type.toUpperCase()),
+                ...(outputPath ? [openLabel] : []),
+            );
+            if (action === openLabel && outputPath) {
+                await vscode.env.openExternal(vscode.Uri.file(outputPath));
+            }
+            return outputPath;
         } catch (error) {
-            Output.log(error)
+            Output.log(error);
+            const detail = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(i18n('ext.markdown.exportFailed', detail));
         }
     }
 
     public getConfig(option: ExportOption) {
         const top = Global.getConfig("pdfMarginTop")
-        const { type = 'pdf', withoutOutline = false } = option;
+        const { type = 'pdf' } = option;
         return {
             type,
             "styles": [],
-            withoutOutline,
+            withoutOutline: true,
             // chromium path
-            "executablePath": this.getChromiumPath(),
+            "executablePath": type === 'html' ? undefined : this.getChromiumPath(),
             // puppeteer launch args (useful for Linux servers running as root)
             "puppeteerArgs": this.getPuppeteerArgs(),
             // Set `true` to convert `\n` in paragraphs into `<br>`.
@@ -103,7 +140,7 @@ export class MarkdownService {
         const chromiumPath = Global.getConfig<string>("chromiumPath")
         const paths = [chromiumPath, ...this.paths]
         for (const path of paths) {
-            if (existsSync(path)) {
+            if (path && existsSync(path)) {
                 console.debug(`using chromium path is ${path}`)
                 return path;
             }
@@ -114,7 +151,6 @@ export class MarkdownService {
             return chromePath;
         } catch (e) {
             const msg = i18n('ext.markdown.noChromium');
-            vscode.window.showErrorMessage(msg)
             throw new Error(msg)
         }
     }

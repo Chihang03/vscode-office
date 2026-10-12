@@ -44,7 +44,7 @@ To use the built-in VS Code Markdown editor instead, add this to your `settings.
 }
 ```
 
-Right-click in the editor to export Markdown to PDF, DOCX, or HTML. PDF export requires Chromium; set the browser path with `kieran-document-studio.chromiumPath`.
+Export PDF from the command palette (`Kieran Document Studio: Export Markdown to PDF`), the editor title toolbar, or the Markdown editor/file context menu. Choose a destination before exporting; pending editor changes are synchronized and saved first. Every page has the source filename at the top left, the local export date (`YYYY-MM-DD`) at the top right, and centered `current page / total pages` at the bottom. PDF export does not generate a table of contents or bookmarks; rendered `[toc]` directives are omitted without changing the source file. PDF export requires an installed Chrome, Edge, or Chromium; configure `kieran-document-studio.chromiumPath` if automatic detection fails. DOCX and HTML export remain available in the custom editor context menu.
 
 
 Shortcuts: Based on [shortcut.md](shortcut.md), plus:
@@ -77,7 +77,7 @@ Shortcuts: Based on [shortcut.md](shortcut.md), plus:
 ```bash
 git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
-npm install
+npm ci
 ```
 
 ### Development

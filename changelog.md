@@ -1,3 +1,13 @@
+# 0.1.1 2026-10-12
+
+- Keep the independent extension identity, current logo, source notices, and branding checks from main.
+- Add Markdown PDF export to the command palette, editor toolbar, and editor/file context menus.
+- Synchronize and save edited content before export, allow destination selection, and report export errors.
+- Print the source filename and local export date in the header and current/total page numbers in the footer.
+- Omit generated tables of contents and PDF bookmarks without modifying source TOC directives.
+- Wait for diagrams and fonts before rendering; close the browser and clean temporary files after failure.
+- Lock dependencies and run PDF regression tests in CI.
+
 # Kieran Document Studio
 
 ## 0.1.0 — independent community fork

@@ -35,3 +35,5 @@ eslint.config.mjs
 vite.config.ts
 build.ts
 package-lock.json
+out/pdf-smoke/**
+.nvmrc

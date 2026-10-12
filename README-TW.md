@@ -44,7 +44,7 @@ Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 
 }
 ```
 
-在編輯器中按右鍵，可將 Markdown 匯出為 PDF、DOCX 或 HTML。PDF 匯出依賴 Chromium，可透過 `kieran-document-studio.chromiumPath` 設定瀏覽器路徑。
+可從命令面板（`Kieran Document Studio：匯出 Markdown 為 PDF`）、編輯器標題列，或 Markdown 編輯器／檔案右鍵選單匯出 PDF。匯出時先選擇儲存位置，再同步並儲存待儲存的編輯內容。每頁左上角顯示來源檔名，右上角顯示本地匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。PDF 不產生目錄或書籤，正文中的 `[toc]` 目錄指令也不會產生目錄，但不會因此修改來源檔案。需要已安裝 Chrome、Edge 或 Chromium；自動偵測失敗時可設定 `kieran-document-studio.chromiumPath`。自訂編輯器右鍵選單繼續支援 DOCX 和 HTML 匯出。
 
 
 快捷鍵：基於 [shortcut.md](shortcut.md)，以及：
@@ -77,7 +77,7 @@ Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 
 ```bash
 git clone https://github.com/Chihang03/vscode-office.git
 cd vscode-office
-npm install
+npm ci
 ```
 
 ### 開發除錯

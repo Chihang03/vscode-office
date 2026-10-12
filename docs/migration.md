@@ -1,6 +1,6 @@
 # 从历史 Office fork 迁移
 
-Kieran Document Studio 使用独立扩展 ID `chihang03.kieran-document-studio`。它会作为单独的扩展安装，不会升级或覆盖 `cweijan.vscode-office`。
+Kieran Document Studio 使用独立扩展 ID `chihang03.kieran-document-studio`。它会作为单独的扩展安装，不会升级或覆盖 `cweijan.vscode-office`，也不会自动升级此前本地构建的 `Chihang03.vscode-office`（4.2.3）。
 
 ## 配置与快捷键
 

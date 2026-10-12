@@ -23,5 +23,10 @@
 	"ext.markdown.customAiUrlRequired": "自定义 AI：API URL 为必填项。",
 	"ext.markdown.customAiPolishFailed": "自定义 AI 润色失败：$1",
 	"ext.markdown.selectImage": "选择图片",
-	"ext.markdown.statusBar": "行 $1 字数 $2"
+	"ext.markdown.statusBar": "行 $1 字数 $2",
+	"ext.markdown.exportPdf": "将 Markdown 导出为 PDF",
+	"ext.markdown.exportFailed": "Markdown 导出失败：$1",
+	"ext.markdown.exportRequiresFile": "请选择扩展运行环境中已保存的 Markdown 文件（.md 或 .markdown）进行导出。",
+	"ext.markdown.exportSaveFailed": "无法保存 Markdown 文件，已停止 PDF 导出。",
+	"ext.markdown.openExport": "打开 PDF"
 }
