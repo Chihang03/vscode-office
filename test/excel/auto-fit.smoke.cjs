@@ -73,7 +73,7 @@ async function main() {
                 buffer: bytes, ext, readOnly, documentCacheId: 'autofit-fixture',
             } }, '*'), { bytes: Array.from(buffer), ext, readOnly });
             await page.waitForFunction(() => window.fits.length > 0);
-            await page.waitForFunction(() => !document.elementFromPoint(10, 100)?.closest('.ant-spin-fullscreen')); 
+            await page.waitForFunction(() => !document.elementFromPoint(10, 100)?.closest('.ant-spin-fullscreen'));
             await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
             assert.deepEqual(errors, [], 'No browser runtime error');
             return page;
