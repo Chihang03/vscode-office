@@ -356,8 +356,8 @@ function ExcelViewer() {
             });
             spreadSheetRef.current = spreadSheet;
             setActiveSpreadsheet(spreadSheet);
-            setLoading(false);
             spreadSheet.loadData(sheets);
+            setLoading(false);
             requestAnimationFrame(() => {
                 setBottombarEl(document.querySelector('.x-spreadsheet-bottombar') as HTMLElement | null);
             });
@@ -380,7 +380,10 @@ function ExcelViewer() {
                 saveViewState(documentCacheIdRef.current, spreadSheet.getSelection());
             };
             spreadSheet.on('cell-selected', () => { persistView(); });
-            spreadSheet.onSheetChange(() => { persistView(); });
+            spreadSheet.onSheetChange(() => {
+                spreadSheet.autoFitColumnsOnce();
+                persistView();
+            });
             spreadSheet.onOpenLink((linkPayload) => {
                 const parsed = parseSpreadsheetLink(linkPayload.link);
                 if (parsed.type === 'internal') {
@@ -404,8 +407,13 @@ function ExcelViewer() {
             const savedView = loadViewState(documentCacheIdRef.current);
             if (savedView) {
                 requestAnimationFrame(() => {
-                    requestAnimationFrame(() => { restoreViewState(spreadSheet, savedView); });
+                    requestAnimationFrame(() => {
+                        restoreViewState(spreadSheet, savedView);
+                        spreadSheet.autoFitColumnsOnce();
+                    });
                 });
+            } else {
+                spreadSheet.autoFitColumnsOnce();
             }
             initialFormattingRef.current = buildFormattingSnapshot(spreadSheet.getData());
         };
@@ -448,7 +456,7 @@ function ExcelViewer() {
             themeObserver.disconnect();
             clearTimeout(themeTimer);
         };
-    }, [message, handleSave, handleSaveAs])
+    }, [message, handleAutoFitColumns, handleSave, handleSaveAs])
 
     return (
         <div className='excel-viewer'>

@@ -24,6 +24,8 @@ This extension lets you preview and edit common office and design files directly
 - Java: `.class` (decompiler)
 - Compressed files: `.zip`, `.jar`, `.vsix`, `.rar`, `.7z`, `.tar`, `.tar.gz`, `.tgz`, `.apk`
 
+CSV, TSV, Excel, and ODS columns automatically fit their contents when the current worksheet is first displayed. Other worksheets are fitted only when first opened, including a restored active sheet. Initial fitting does not mark the file as modified. Manual resizing is preserved during editing and sheet switching; the AF button still fits columns on demand.
+
 ## Git History
 
 Kieran Document Studio includes a full Git History workspace for exploring repositories without leaving VS Code. Open it from the Source Control view, the editor title bar, the editor context menu, or the file explorer context menu.
@@ -44,7 +46,7 @@ To use the built-in VS Code Markdown editor instead, add this to your `settings.
 }
 ```
 
-Export PDF from the command palette (`Kieran Document Studio: Export Markdown to PDF`), the editor title toolbar, or the Markdown editor/file context menu. Choose a destination before exporting; pending editor changes are synchronized and saved first. Every page has the source filename at the top left, the local export date (`YYYY-MM-DD`) at the top right, and centered `current page / total pages` at the bottom. PDF export does not generate a table of contents or bookmarks; rendered `[toc]` directives are omitted without changing the source file. PDF export requires an installed Chrome, Edge, or Chromium; configure `kieran-document-studio.chromiumPath` if automatic detection fails. DOCX and HTML export remain available in the custom editor context menu.
+Export PDF from the command palette (`Kieran Document Studio: Export Markdown to PDF`), the editor title toolbar, or the Markdown editor/file context menu. Choose a destination before exporting; pending editor changes are synchronized and saved first. Every page has the source filename at the top left, the local export date (`YYYY-MM-DD`) at the top right, and centered `current page / total pages` at the bottom. PDF export generates clickable, nested bookmarks from Markdown headings (`#` through `######`) and requests the outline sidebar on open. It does not insert a table of contents into the body; rendered `[toc]` directives are omitted without changing the source file. Whether the sidebar opens automatically depends on the PDF viewer. PDF export requires an installed Chrome, Edge, or Chromium; configure `kieran-document-studio.chromiumPath` if automatic detection fails. DOCX and HTML export remain available in the custom editor context menu.
 
 
 Shortcuts: Based on [shortcut.md](shortcut.md), plus:

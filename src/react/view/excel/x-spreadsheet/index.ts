@@ -208,6 +208,7 @@ export class Spreadsheet {
     private options: Options;
     private sheetIndex: number;
     private datas: DataProxy[];
+    private autoFittedSheets = new WeakSet<DataProxy>();
     private bottombar: Bottombar | null;
     private data: DataProxy;
     private sheet: Sheet;
@@ -451,7 +452,16 @@ export class Spreadsheet {
         return { ri, ci, sheetIndex: this.getActiveSheetIndex() };
     }
 
-    autoFitColumns(sheetIndex = this.getActiveSheetIndex()): this {
+    autoFitColumnsOnce(): this {
+        const index = this.getActiveSheetIndex();
+        const data = this.datas[index];
+        if (data && !this.autoFittedSheets.has(data)) {
+            this.autoFitColumns(index, { recordChange: false });
+        }
+        return this;
+    }
+
+    autoFitColumns(sheetIndex = this.getActiveSheetIndex(), { recordChange = true }: { recordChange?: boolean } = {}): this {
         const data = this.datas[sheetIndex];
         if (!data || typeof document === 'undefined') return this;
 
@@ -466,7 +476,7 @@ export class Spreadsheet {
         const maxWidth = 720;
         const textPadding = 22;
 
-        data.changeData(() => {
+        const fit = () => {
             for (let ci = 0; ci < colLen; ci += 1) {
                 let width = minWidth;
 
@@ -492,8 +502,15 @@ export class Spreadsheet {
 
                 data.cols.setWidth(ci, Math.max(minWidth, Math.min(maxWidth, width)));
             }
-        });
+        };
+        // Initial layout must not create an edit, undo entry, or dirty notification.
+        if (recordChange) {
+            data.changeData(fit);
+        } else {
+            fit();
+        }
 
+        this.autoFittedSheets.add(data);
         if (sheetIndex === this.getActiveSheetIndex()) {
             this.sheet.resetData(data);
         }

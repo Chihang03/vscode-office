@@ -24,6 +24,8 @@
 - Java: `.class`（反編譯）
 - 壓縮檔案: `.zip`、`.jar`、`.vsix`、`.rar`、`.7z`、`.tar`、`.tar.gz`、`.tgz`、`.apk`
 
+CSV、TSV、Excel 和 ODS 表格開啟後，會按內容自動適配目前工作表的欄寬；其他工作表在第一次切換到它時才執行，恢復上次查看的工作表也遵循此規則，不會因此將檔案標記為已修改。之後手動調整的欄寬在編輯和切換工作表時保留；仍可點擊 AF 按鈕再次適配。
+
 ## Git 歷史
 
 Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 VS Code 即可瀏覽儲存庫。可從原始碼控制檢視、編輯器標題列、編輯器右鍵選單或檔案總管右鍵選單開啟。
@@ -44,7 +46,7 @@ Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 
 }
 ```
 
-可從命令面板（`Kieran Document Studio：匯出 Markdown 為 PDF`）、編輯器標題列，或 Markdown 編輯器／檔案右鍵選單匯出 PDF。匯出時先選擇儲存位置，再同步並儲存待儲存的編輯內容。每頁左上角顯示來源檔名，右上角顯示本地匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。PDF 不產生目錄或書籤，正文中的 `[toc]` 目錄指令也不會產生目錄，但不會因此修改來源檔案。需要已安裝 Chrome、Edge 或 Chromium；自動偵測失敗時可設定 `kieran-document-studio.chromiumPath`。自訂編輯器右鍵選單繼續支援 DOCX 和 HTML 匯出。
+可從命令面板（`Kieran Document Studio：匯出 Markdown 為 PDF`）、編輯器標題列，或 Markdown 編輯器／檔案右鍵選單匯出 PDF。匯出時先選擇儲存位置，再同步並儲存待儲存的編輯內容。每頁左上角顯示來源檔名，右上角顯示本地匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。PDF 根據一至六級 Markdown 標題（`#` 至 `######`）產生可點擊的分層書籤，並提示檢視器開啟大綱側欄；是否自動展開由檢視器決定。正文不插入目錄，`[toc]` 目錄指令仍不呈現，也不會因此修改來源檔案。需要已安裝 Chrome、Edge 或 Chromium；自動偵測失敗時可設定 `kieran-document-studio.chromiumPath`。自訂編輯器右鍵選單繼續支援 DOCX 和 HTML 匯出。
 
 
 快捷鍵：基於 [shortcut.md](shortcut.md)，以及：

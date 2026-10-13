@@ -1,3 +1,9 @@
+# 0.1.2 2026-10-13
+
+- Fit columns when the current worksheet is first displayed in CSV, TSV, Excel, and ODS viewers. Defer other worksheets until first activation, including restored selections.
+- Treat initial fitting as display layout: do not mark the file dirty or add an undo entry. Manual fitting remains an editable action.
+- Preserve manual column resizing while editing and switching worksheets.
+
 # 0.1.1 2026-10-12
 
 - Keep the independent extension identity, current logo, source notices, and branding checks from main.
