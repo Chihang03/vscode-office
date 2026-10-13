@@ -1,3 +1,10 @@
+# 0.1.3 2026-10-13
+
+- Combine PDF heading navigation and first-view table column fitting in one release.
+- Generate nested PDF bookmarks and semantic heading tags from Markdown headings without inserting a visible table of contents.
+- Preserve exact heading destinations, filename/date headers, page-number footers, and the current product logo.
+- Keep CSV/TSV/Excel/ODS fitting limited to each worksheet's first display, preserving later manual widths and clean document state.
+
 # 0.1.2 2026-10-13
 
 - Fit columns when the current worksheet is first displayed in CSV, TSV, Excel, and ODS viewers. Defer other worksheets until first activation, including restored selections.

@@ -19,7 +19,9 @@ export function createPdfOptions(filePath, config = {}, exportedAt = new Date())
         format: config.format || "A4",
         printBackground: config.printBackground ?? true,
         displayHeaderFooter: true,
-        outline: false,
+        // Chromium derives nested bookmarks and heading tags from h1-h6.
+        outline: true,
+        tagged: true,
         headerTemplate: `<div style="width:100%;box-sizing:border-box;padding:0 50px;display:flex;align-items:center;${font}">
             <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:24px;">${filename}</span>
             <span style="flex-shrink:0;white-space:nowrap;">${date}</span>

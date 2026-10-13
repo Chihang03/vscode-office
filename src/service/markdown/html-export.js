@@ -3,6 +3,7 @@ const os = require("os")
 const path = require("path")
 const { pathToFileURL } = require("url")
 const { createPdfOptions } = require("./pdf-layout")
+const { preparePdfNavigation } = require("./pdf-navigation")
 const isDev = process.argv.indexOf('--type=extensionHost') >= 0;
 
 export async function exportHtml(exportFilePath, data) {
@@ -61,7 +62,7 @@ export async function exportByType(filePath, data, type, config) {
             }))
         })
         const pdf = await page.pdf(createPdfOptions(filePath, config))
-        const pdfBytes = Buffer.from(pdf)
+        const pdfBytes = await preparePdfNavigation(pdf)
         fs.writeFileSync(targetFilePath, pdfBytes)
         console.log("[pretty-md-pdf] Exported to file: " + targetFilePath)
     } finally {
