@@ -44,7 +44,7 @@ Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 
 }
 ```
 
-可從命令面板（`Kieran Document Studio：匯出 Markdown 為 PDF`）、編輯器標題列，或 Markdown 編輯器／檔案右鍵選單匯出 PDF。匯出時先選擇儲存位置，再同步並儲存待儲存的編輯內容。每頁左上角顯示來源檔名，右上角顯示本地匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。PDF 不產生目錄或書籤，正文中的 `[toc]` 目錄指令也不會產生目錄，但不會因此修改來源檔案。需要已安裝 Chrome、Edge 或 Chromium；自動偵測失敗時可設定 `kieran-document-studio.chromiumPath`。自訂編輯器右鍵選單繼續支援 DOCX 和 HTML 匯出。
+可從命令面板（`Kieran Document Studio：匯出 Markdown 為 PDF`）、編輯器標題列，或 Markdown 編輯器／檔案右鍵選單匯出 PDF。匯出時先選擇儲存位置，再同步並儲存待儲存的編輯內容。每頁左上角顯示來源檔名，右上角顯示本地匯出日期（`YYYY-MM-DD`），底部置中顯示「目前頁 / 總頁數」。PDF 根據 Markdown 一至六級標題產生可點擊的分層書籤，並提示檢視器開啟大綱側欄；是否自動展開由檢視器決定。正文不插入目錄，`[toc]` 目錄指令仍不呈現，也不會因此修改來源檔案。需要已安裝 Chrome、Edge 或 Chromium；自動偵測失敗時可設定 `kieran-document-studio.chromiumPath`。自訂編輯器右鍵選單繼續支援 DOCX 和 HTML 匯出。
 
 
 快捷鍵：基於 [shortcut.md](shortcut.md)，以及：

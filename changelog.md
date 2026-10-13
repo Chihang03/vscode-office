@@ -1,3 +1,9 @@
+# 0.1.2 2026-10-13
+
+- Generate nested PDF bookmarks and semantic heading tags from Markdown headings without adding a visible table of contents.
+- Preserve exact heading destinations and request the outline sidebar when a viewer honors PDF PageMode.
+- Keep filename/date headers, page-number footers, and the current product logo.
+
 # 0.1.1 2026-10-12
 
 - Keep the independent extension identity, current logo, source notices, and branding checks from main.

@@ -124,6 +124,7 @@ test('PDF browser failure closes the browser, cleans temp files, and preserves e
     fs.writeFileSync(output, 'original');
     const state = { closed: false, tempFile: undefined };
     const { exportByType } = await load('src/service/markdown/html-export.js', {
+        './pdf-navigation': 'export async function preparePdfNavigation(bytes) { return Buffer.from(bytes); }',
         'puppeteer-core': `module.exports = { launch: async () => ({
             newPage: async () => ({ goto: async (url) => { state.tempFile = require('node:url').fileURLToPath(url); throw new Error('navigation failed'); } }),
             close: async () => { state.closed = true; }
@@ -138,11 +139,12 @@ test('PDF browser failure closes the browser, cleans temp files, and preserves e
     } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('PDF pages use escaped filenames, local dates, and page numbers without a directory', async () => {
+test('PDF pages use escaped filenames, local dates, and page numbers with a heading outline', async () => {
     const { createPdfOptions } = await load('src/service/markdown/pdf-layout.js', {}, {});
     const options = createPdfOptions('/docs/中文 & <report> "draft".md', {}, new Date(2026, 0, 2));
     assert.equal(options.displayHeaderFooter, true);
-    assert.equal(options.outline, false);
+    assert.equal(options.outline, true);
+    assert.equal(options.tagged, true);
     assert.match(options.headerTemplate, /中文 &amp; &lt;report&gt; &quot;draft&quot;\.md/);
     assert.match(options.headerTemplate, /2026-01-02/);
     const header = require('node-html-parser').parse(options.headerTemplate).querySelector('div');
@@ -162,6 +164,7 @@ test('the PDF rendering path applies the header/footer options', async () => {
     const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'office-pdf-layout-'));
     const state = { closed: false };
     const { exportByType } = await load('src/service/markdown/html-export.js', {
+        './pdf-navigation': 'export async function preparePdfNavigation(bytes) { return Buffer.from(bytes); }',
         'puppeteer-core': `module.exports = { launch: async () => ({
             newPage: async () => ({ goto: async () => {}, evaluate: async () => false,
                 pdf: async options => { state.options = options; return Buffer.from('%PDF-test'); } }),
@@ -173,7 +176,8 @@ test('the PDF rendering path applies the header/footer options', async () => {
         await exportByType(path.join(temp, 'original.md'), '<p>test</p>', 'pdf', { outputPath });
         assert.match(state.options.headerTemplate, /original\.md/);
         assert.equal(state.options.displayHeaderFooter, true);
-        assert.equal(state.options.outline, false);
+        assert.equal(state.options.outline, true);
+        assert.equal(state.options.tagged, true);
         assert.equal(state.closed, true);
         assert.equal(fs.readFileSync(outputPath, 'utf8'), '%PDF-test');
     } finally { fs.rmSync(temp, { recursive: true, force: true }); }
@@ -198,4 +202,41 @@ test('PDF omits generated TOC directives while retaining source and literal code
         assert.match(document.querySelector('pre').textContent, /\[toc\]/);
         assert.equal(fs.readFileSync(source, 'utf8'), markdown);
     } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('outline sidebar preference preserves destinations and semantic heading tags', async () => {
+    const { PDFDocument, PDFName, PDFHexString, PDFNumber } = require('pdf-lib');
+    const { preparePdfNavigation } = await load('src/service/markdown/pdf-navigation.js', {}, {});
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    const treeRef = pdf.context.nextRef();
+    const itemRef = pdf.context.nextRef();
+    pdf.context.assign(itemRef, pdf.context.obj({
+        Title: PDFHexString.fromText('中文标题'), Parent: treeRef,
+        Dest: [page.ref, PDFName.of('XYZ'), PDFNumber.of(12), PDFNumber.of(700), null],
+    }));
+    pdf.context.assign(treeRef, pdf.context.obj({ Type: 'Outlines', First: itemRef, Last: itemRef, Count: 1 }));
+    pdf.catalog.set(PDFName.of('Outlines'), treeRef);
+    const tagsRef = pdf.context.register(pdf.context.obj({ Type: 'StructTreeRoot', K: [] }));
+    pdf.catalog.set(PDFName.of('StructTreeRoot'), tagsRef);
+    const result = await PDFDocument.load(await preparePdfNavigation(await pdf.save()));
+    assert.equal(result.catalog.get(PDFName.of('PageMode')).toString(), '/UseOutlines');
+    const tree = result.catalog.lookup(PDFName.of('Outlines'));
+    const item = result.context.lookup(tree.get(PDFName.of('First')));
+    assert.equal(item.lookup(PDFName.of('Title')).decodeText(), '中文标题');
+    assert.equal(item.lookup(PDFName.of('Dest')).get(0).toString(), result.getPage(0).ref.toString());
+    assert.equal(item.lookup(PDFName.of('Dest')).get(3).asNumber(), 700);
+    assert.ok(result.catalog.has(PDFName.of('StructTreeRoot')));
+});
+
+test('a document without headings gets no invented bookmarks or sidebar preference', async () => {
+    const { PDFDocument, PDFName } = require('pdf-lib');
+    const { preparePdfNavigation } = await load('src/service/markdown/pdf-navigation.js', {}, {});
+    const pdf = await PDFDocument.create(); pdf.addPage();
+    const bytes = await pdf.save();
+    const resultBytes = await preparePdfNavigation(bytes);
+    assert.deepEqual(Buffer.from(resultBytes), Buffer.from(bytes));
+    const result = await PDFDocument.load(resultBytes);
+    assert.equal(result.catalog.has(PDFName.of('Outlines')), false);
+    assert.equal(result.catalog.has(PDFName.of('PageMode')), false);
 });
