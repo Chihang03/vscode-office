@@ -58,6 +58,12 @@ Shortcuts: Based on [shortcut.md](shortcut.md), plus:
 - Edit in VS Code: `Ctrl Alt E` / `⌘ ^ E`
 - Paste as plain text: `Ctrl+Shift+V` / `⌘ ⇧ V`
 
+## Diagram editing (Draw.io format)
+
+Open `.drawio`, `.dio`, `.drawio.svg` or `.drawio.png` files with **Kieran Document Studio: Diagram Editor**, or use the **New Diagram / Open Diagram** commands. The bundled draw.io 32.4.1 engine works offline and does not require another extension. Edit shapes, text, connectors and pages; use Save or Ctrl/Cmd+S to save through VS Code. XML/SVG use text document dirty state and undo/redo; PNG retains embedded diagram data, native undo/redo and backup support. Export SVG/PNG produces images with editable diagram metadata. Ordinary SVG/PNG files continue to use the existing viewers. If another Draw.io extension is installed, select the desired editor using **Reopen Editor With**.
+
+Unsaved diagram edits remain in VS Code rather than automatically writing to disk. External XML changes update the canvas; simultaneous edits with stale versions are rejected with a reload message. Git/read-only sources support preview and export. Cloud integrations, plugins, code links and Live Share are outside this first integration. The offline engine raises the minimum VS Code version to **1.95**. The independent adapter is maintained by Kieran Dai; the engine and bundled assets retain their upstream notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## Audio viewing
 
 Open an audio file, or choose **Reopen Editor With → Kieran Document Studio Audio Viewer**. The viewer is read-only and waits for you to press Play. It provides per-channel waveforms, a time ruler and playhead, click-to-seek, speed, volume and mute controls. Drag to select a segment and enable **A–B loop**. Use the wheel or zoom buttons to magnify the waveform, drag in **Pan** mode (or Shift-drag) to move, use the overview to navigate, and **Full track** to reset. Playback position is remembered in the workspace; waveforms are cached by file version.
@@ -82,7 +88,7 @@ In **Zoom** mode, scroll over the image to zoom around the pointer. Drag an enla
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 24 (tested build and packaging runtime)
-- [VS Code](https://code.visualstudio.com/) 1.64+
+- [VS Code](https://code.visualstudio.com/) 1.95+
 
 ### Getting started
 

@@ -2,11 +2,11 @@
 	"name": "kieran-document-studio",
 	"displayName": "Kieran Document Studio（文档工作台）",
 	"description": "Kieran Dai 独立维护的社区 fork：在 VS Code 中查看办公文档、编辑 Markdown，并浏览 Git 历史。",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"publisher": "chihang03",
 	"icon": "image/kieran-document-studio.png",
 	"engines": {
-		"vscode": "^1.64.0",
+		"vscode": "^1.95.0",
 		"node": ">=22.12.0"
 	},
 	"keywords": [
@@ -35,7 +35,9 @@
 		"git-history",
 		"audio",
 		"wav",
-		"waveform"
+		"waveform",
+		"drawio",
+		"diagram"
 	],
 	"categories": [
 		"Visualization",
@@ -267,6 +269,16 @@
 				"category": "Kieran Document Studio",
 				"icon": "$(export)",
 				"enablement": "!kieranDocumentStudio.extensionHost.web"
+			},
+			{
+				"command": "kieranDocumentStudio.drawio.open",
+				"title": "%command.drawio.open%",
+				"category": "Kieran Document Studio"
+			},
+			{
+				"command": "kieranDocumentStudio.drawio.new",
+				"title": "%command.drawio.new%",
+				"category": "Kieran Document Studio"
 			}
 		],
 		"keybindings": [
@@ -636,6 +648,29 @@
 						"filenamePattern": "*.{wav,WAV,wave,WAVE,mp3,MP3,flac,FLAC,ogg,OGG,oga,OGA,opus,OPUS,m4a,M4A,aac,AAC,aif,AIF,aiff,AIFF,webm,WEBM}"
 					}
 				]
+			},
+			{
+				"viewType": "kieranDocumentStudio.drawioEditor",
+				"displayName": "%ext.drawioEditor%",
+				"priority": "default",
+				"selector": [
+					{
+						"filenamePattern": "*.{drawio,DRAWIO,dio,DIO}"
+					},
+					{
+						"filenamePattern": "*.{drawio,DRAWIO}.{svg,SVG}"
+					}
+				]
+			},
+			{
+				"viewType": "kieranDocumentStudio.drawioPngEditor",
+				"displayName": "%ext.drawioEditor%",
+				"priority": "default",
+				"selector": [
+					{
+						"filenamePattern": "*.{drawio,DRAWIO}.{png,PNG}"
+					}
+				]
 			}
 		],
 		"configuration": [
@@ -872,7 +907,9 @@
 		"test:excel:smoke": "node test/excel/auto-fit.smoke.cjs",
 		"test:image:smoke": "node test/image/pan-zoom.smoke.cjs",
 		"test:audio": "node --test test/audio/*.test.cjs",
-		"test:audio:smoke": "node test/audio/audio.smoke.cjs"
+		"test:audio:smoke": "node test/audio/audio.smoke.cjs",
+		"test:drawio": "node --test test/drawio/*.test.cjs",
+		"test:drawio:smoke": "node test/drawio/editor.smoke.cjs"
 	},
 	"devDependencies": {
 		"@types/diff-match-patch": "1.0.32",

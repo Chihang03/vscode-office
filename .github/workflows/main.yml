@@ -19,6 +19,7 @@ jobs:
     - run: npm run package -- --out kieran-document-studio.vsix
     - run: npm run test:pdf
     - run: npm run test:audio
+    - run: npm run test:drawio
     - uses: actions/upload-artifact@v4
       with:
         name: kieran-document-studio

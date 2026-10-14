@@ -29,5 +29,8 @@
 	"ext.markdown.exportRequiresFile": "Select a saved Markdown file (.md or .markdown) on the extension host to export.",
 	"ext.markdown.exportSaveFailed": "The Markdown file could not be saved. PDF export was stopped.",
 	"ext.markdown.openExport": "Open PDF",
-	"ext.audioViewer": "Kieran Document Studio: Audio Viewer"
+	"ext.audioViewer": "Kieran Document Studio: Audio Viewer",
+	"ext.drawioEditor": "Kieran Document Studio: Diagram Editor",
+	"command.drawio.open": "Open Diagram",
+	"command.drawio.new": "New Diagram"
 }

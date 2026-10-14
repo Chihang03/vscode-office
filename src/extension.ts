@@ -1,3 +1,4 @@
+import { registerDiagrams } from './drawio/provider';
 import * as vscode from 'vscode';
 import { Global } from './common/global';
 import { TelemetryService } from './service/telemetryService';
@@ -27,6 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	activateGitHistory(context);
 	const viewOption = { webviewOptions: { retainContextWhenHidden: true } };
 	FileUtil.init(context)
+	registerDiagrams(context);
 	ReactApp.init(context)
 	const markdownService = new MarkdownService(context);
 	const viewerInstance = new OfficeViewerProvider(context);

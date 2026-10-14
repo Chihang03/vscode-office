@@ -1,3 +1,4 @@
+import { registerDiagrams } from './drawio/provider';
 /**
  * Web extension host entry (`package.json#browser`).
  * Desktop-only: HTTP, Git History, clipboard paste, Java decompile, archive viewer.
@@ -24,6 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	TelemetryService.init(context);
 	await IconService.getInstance().init(context);
 	FileUtil.init(context);
+	registerDiagrams(context);
 	ReactApp.init(context);
 	activateYaml(context);
 	activateXml(context);

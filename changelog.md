@@ -1,3 +1,11 @@
+# 0.1.6 2026-10-14
+
+- Add offline editing of .drawio, .dio, .drawio.svg and .drawio.png using the pinned draw.io 32.4.1 engine and an independent VS Code adapter.
+- Preserve editable metadata in SVG/PNG round trips and exports; integrate text dirty state, undo/redo, custom PNG backups and native saves.
+- Synchronize external text changes, reject stale writes, and support read-only diagram preview/export.
+- Add New Diagram/Open Diagram commands, source notices, integrity hashes and focused regression tests.
+- Require VS Code 1.95+ for the bundled engine's browser runtime; retain existing branding, logo, audio, image and PDF functionality.
+
 # 0.1.5 2026-10-14
 
 - Add a read-only audio viewer with per-channel waveform, time ruler, moving playhead, click-to-seek, zoom, pan and overview navigation.

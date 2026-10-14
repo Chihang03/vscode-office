@@ -58,6 +58,12 @@ Kieran Document Studio 內建完整的 Git 歷史工作區，讓你無需離開 
 - 在 VS Code 中編輯: `Ctrl Alt E` / `⌘ ^ E`
 - 貼上為純文字: `Ctrl+Shift+V` / `⌘ ⇧ V`
 
+## 圖形編輯（Draw.io 格式）
+
+支援 `.drawio`、`.dio`、`.drawio.svg` 與 `.drawio.png`，可選擇 **Kieran Document Studio 圖形編輯器** 開啟，或使用命令面板的 **新增圖形 / 開啟圖形**。內建 draw.io 32.4.1 離線核心，無需另裝擴充套件；可以編輯形狀、文字、連線與頁面，透過儲存按鈕或 Ctrl/Cmd+S 儲存。XML/SVG 使用 VS Code 文字文件的未儲存標記與復原重做；PNG 保留內嵌圖形資料，並支援原生復原重做與備份。匯出的 SVG/PNG 也保留可繼續編輯的圖形資料。普通 SVG/PNG 仍使用原來的檢視器。同時安裝其他 Draw.io 擴充套件時，可透過 **重新開啟編輯器方式** 選擇。
+
+修改先保留在 VS Code 未儲存緩衝區，不會每次修改就寫入磁碟。外部 XML 更新會同步至畫布；版本過期的並行修改會被拒絕並提示重新載入。Git 或唯讀來源可預覽與匯出。首版不含雲端儲存、外掛、程式碼連結或 Live Share。最低 VS Code 版本調整為 **1.95**。適配由 Kieran Dai 獨立維護，核心及素材保留原始來源與許可，詳見 [第三方說明](THIRD_PARTY_NOTICES.md)。
+
 ## 音訊檢視
 
 開啟音訊檔案，或選擇 **重新開啟編輯器方式 → Kieran Document Studio 音訊檢視器**。音訊為唯讀預覽，點擊播放後才開始播放。介面提供分聲道波形、時間軸與播放線、點擊定位、倍速、音量及靜音控制。在波形上拖曳選取後可啟用 **A–B 循環**。滾輪或縮放按鈕放大波形，切換 **平移** 模式拖曳（也可按住 Shift 拖曳），下方總覽可快速導覽，**完整音軌** 恢復全貌。工作區會記住播放位置，波形依檔案版本快取。
@@ -82,7 +88,7 @@ PCM 與 IEEE 浮點 WAV 在本機 worker 中串流計算波形，取樣率、聲
 ### 環境要求
 
 - [Node.js](https://nodejs.org/) 24（已驗證的建置與打包環境）
-- [VS Code](https://code.visualstudio.com/) 1.64+
+- [VS Code](https://code.visualstudio.com/) 1.95+
 
 ### 快速開始
 
