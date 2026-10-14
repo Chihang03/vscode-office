@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { handler } from '../../util/vscode';
 import { type ImageSource, needsConversion, resolveImageSrc, revokeObjectUrl } from './convertImage';
 import './Image.less';
 import SponsorBar from '../components/SponsorBar';
+import ImageViewport from './ImageViewport';
 
 type WheelMode = 'navigate' | 'zoom';
-
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 5;
 
 function ZoomIcon() {
     return (
@@ -37,23 +35,27 @@ export default function Image() {
     const [resolvedImages, setResolvedImages] = useState<{ original: string; thumbnail: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [wheelMode, setWheelMode] = useState<WheelMode>('zoom');
-    const [zoom, setZoom] = useState(1);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [resetId, setResetId] = useState(0);
+    const [canPan, setCanPan] = useState(false);
+    const previousBrowseRef = useRef(0);
     const objectUrlsRef = useRef<string[]>([]);
 
-    const applyZoom = useCallback((scale: number) => {
-        const img = document.querySelector('.image-gallery-slide.image-gallery-center .image-gallery-image') as HTMLElement | null;
-        if (!img) return;
-        img.style.transform = scale === 1 ? '' : `scale(${scale})`;
+    const resetView = useCallback(() => {
+        setResetId(value => value + 1);
+        setCanPan(false);
     }, []);
-
-    useEffect(() => {
-        applyZoom(zoom);
-    }, [zoom, applyZoom, resolvedImages]);
+    const browse = useCallback((direction: number) => {
+        if (!gallery.current || Date.now() - previousBrowseRef.current < 300) return;
+        previousBrowseRef.current = Date.now();
+        gallery.current.slideToIndex(gallery.current.getCurrentIndex() + direction);
+    }, []);
 
     useEffect(() => {
         handler.on('images', info => {
             setInfo(info);
-            setZoom(1);
+            setActiveIndex(info.current);
+            resetView();
             const hasResolvable = info.images.some((image: ImageSource) =>
                 needsConversion(image) || !!image.buffer?.length
             );
@@ -63,7 +65,7 @@ export default function Image() {
                 setLoading(false);
             }
         }).emit('images');
-    }, []);
+    }, [resetView]);
 
     useEffect(() => {
         let cancelled = false;
@@ -105,28 +107,17 @@ export default function Image() {
         };
     }, [info.images]);
 
-    useEffect(() => {
-        let previous = 0;
-        const onWheel = (e: WheelEvent) => {
-            if (wheelMode === 'navigate') {
-                if (Date.now() - previous < 300) return;
-                previous = Date.now();
-                const current = gallery.current.getCurrentIndex();
-                gallery.current.slideToIndex(current + (e.deltaY > 0 ? 1 : -1));
-                return;
-            }
-            e.preventDefault();
-            const factor = Math.pow(1.001, -e.deltaY);
-            setZoom(value => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value * factor)));
-        };
-        addEventListener('wheel', onWheel, { passive: false });
-        return () => removeEventListener('wheel', onWheel);
-    }, [wheelMode]);
-
-    const images = resolvedImages.length ? resolvedImages : info.images.map((image: { src: string }) => ({
-        original: image.src,
-        thumbnail: image.src
-    }));
+    const images = useMemo(() => {
+        const sources = resolvedImages.length ? resolvedImages : info.images.map((image: { src: string }) => ({
+            original: image.src, thumbnail: image.src
+        }));
+        return sources.map((image, index) => ({ ...image, index }));
+    }, [resolvedImages, info.images]);
+    const renderImage = useCallback((item: { original: string; index: number }) => (
+        <ImageViewport key={`${item.original}:${resetId}`} src={item.original}
+            alt={info.images[item.index]?.title || 'Image'} active={item.index === activeIndex}
+            wheelMode={wheelMode} onBrowse={browse} onPanAvailabilityChange={setCanPan} />
+    ), [activeIndex, resetId, wheelMode, browse, info.images]);
 
     return (
         <div className="image-viewer">
@@ -153,11 +144,20 @@ export default function Image() {
                     <BrowseIcon />
                     <span className="image-wheel-toolbar__label">Browse</span>
                 </button>
+                <span className="image-wheel-toolbar__divider" aria-hidden="true" />
+                <button type="button" className="image-wheel-toolbar__btn"
+                    title="Fit image to window (double-click image)" onClick={resetView} disabled={!images.length}>
+                    <span className="image-wheel-toolbar__label">Fit</span>
+                </button>
             </div>
             <ImageGallery ref={gallery} items={images} startIndex={info.current} lazyLoad={true}
                 slideDuration={0} showIndex={true} showFullscreenButton={false} showPlayButton={false}
+                renderItem={renderImage} disableSwipe={wheelMode === 'zoom' || canPan}
+                onBeforeSlide={(index) => {
+                    setActiveIndex(index);
+                    resetView();
+                }}
                 onSlide={(index) => {
-                    setZoom(1);
                     const title = info.images[index]?.title;
                     if (title) handler.emit('slideTitle', title);
                 }}

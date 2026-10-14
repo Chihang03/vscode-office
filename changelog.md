@@ -1,3 +1,18 @@
+# 0.1.5 2026-10-14
+
+- Add a read-only audio viewer with per-channel waveform, time ruler, moving playhead, click-to-seek, zoom, pan and overview navigation.
+- Add selection-based A–B looping, playback speed, volume, mute and workspace playback-position restoration without autoplay.
+- Stream PCM/IEEE float WAV waveform processing in an inline worker, preserve source metadata, and cache bounded peak envelopes by file version.
+- Use available browser decoders for other audio formats with size checks and clear unsupported/truncated-file messages; retain native playback when waveform processing is cancelled or unavailable.
+- Include the pending image zoom/pan fix from 0.1.4 and preserve the current independent brand and logo.
+
+# 0.1.4 2026-10-14
+
+- Pan zoomed images by dragging, with bounded movement and grab/grabbing cursors.
+- Zoom around the pointer; double-click or use Fit to restore the centered view.
+- Preserve Browse wheel navigation and arrow/thumbnail navigation; reset the view on image changes.
+- Restrict zoom events to the active image viewport and avoid conflicting carousel swipes.
+
 # 0.1.3 2026-10-13
 
 - Combine PDF heading navigation and first-view table column fitting in one release.

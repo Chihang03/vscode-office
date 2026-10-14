@@ -58,6 +58,16 @@ Shortcuts: Based on [shortcut.md](shortcut.md), plus:
 - Edit in VS Code: `Ctrl Alt E` / `⌘ ^ E`
 - Paste as plain text: `Ctrl+Shift+V` / `⌘ ⇧ V`
 
+## Audio viewing
+
+Open an audio file, or choose **Reopen Editor With → Kieran Document Studio Audio Viewer**. The viewer is read-only and waits for you to press Play. It provides per-channel waveforms, a time ruler and playhead, click-to-seek, speed, volume and mute controls. Drag to select a segment and enable **A–B loop**. Use the wheel or zoom buttons to magnify the waveform, drag in **Pan** mode (or Shift-drag) to move, use the overview to navigate, and **Full track** to reset. Playback position is remembered in the workspace; waveforms are cached by file version.
+
+PCM and IEEE float WAV waveforms are processed incrementally in a local worker; sample rate, channel count and bit depth come from the source header. MP3, FLAC, OGG/Opus, M4A/AAC, AIFF and audio WebM use the decoder available in your VS Code build, so support can vary by codec and platform. Their displayed sample rate is the **decoded** rate. Generic waveform decoding is limited to 32 MiB encoded data, with a conservative duration preflight and a 128 MiB decoded-data check. When waveform generation is unavailable or cancelled, supported native playback remains available. Virtual/remote files are limited to 16 MiB. Waveforms show up to eight channels; A–B loops use the media playback clock and are intended for listening, not sample-accurate editing.
+
+## Image viewing
+
+In **Zoom** mode, scroll over the image to zoom around the pointer. Drag an enlarged image to inspect its edges; double-click the image or select **Fit** to restore the centered view. **Browse** uses the wheel to switch images. Arrow and thumbnail navigation remain available and reset the view for the next image.
+
 ## Other features
 
 - HTML: live preview while editing; press `Ctrl+Shift+V` to open the live view

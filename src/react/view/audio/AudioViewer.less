@@ -1,0 +1,46 @@
+.studio-audio {
+    --wave-color: var(--vscode-charts-purple, #a79aff);
+    --wave-muted: var(--vscode-descriptionForeground, #94a0b6);
+    box-sizing: border-box; height: 100vh; overflow: auto; padding: 28px 32px 20px;
+    color: var(--vscode-editor-foreground, #dae1ef); background: var(--vscode-editor-background, #171c28);
+    font-family: var(--vscode-font-family, system-ui, sans-serif); font-size: 13px;
+    * { box-sizing: border-box; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+    h1 { font-size: 22px; font-weight: 600; margin: 7px 0 0; overflow-wrap: anywhere; }
+    .audio-eyebrow { font-size: 10px; letter-spacing: .12em; color: var(--wave-muted); }
+    .audio-format { border: 1px solid var(--wave-muted); border-radius: 6px; padding: 5px 10px; font-size: 11px; }
+    button, select { color: inherit; background: var(--vscode-button-secondaryBackground, #2c3448); border: 1px solid var(--vscode-widget-border, #3a4255); border-radius: 5px; padding: 6px 10px; cursor: pointer; font: inherit; }
+    button:hover { background: var(--vscode-button-secondaryHoverBackground, #414967); }
+    button:disabled { opacity: .45; cursor: default; }
+    button[aria-pressed=true] { border-color: var(--wave-color); color: var(--wave-color); }
+    button:focus-visible, canvas:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--vscode-focusBorder, #a79aff); outline-offset: 2px; }
+    input { accent-color: var(--wave-color); }
+    .audio-meta { display: flex; flex-wrap: wrap; gap: 20px 36px; margin-bottom: 24px; }
+    .audio-meta div { display: flex; flex-direction: column; gap: 7px; }
+    .audio-meta span { color: var(--wave-muted); font-size: 11px; }
+    .audio-meta strong { font-weight: 500; }
+    .audio-panel { border: 1px solid var(--vscode-widget-border, #3a4255); border-radius: 9px; overflow: hidden; }
+    .audio-toolbar { padding: 12px; display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+    .audio-mode, .audio-zoom { display: flex; gap: 5px; align-items: center; }
+    .audio-zoom span { min-width: 45px; text-align: center; font-variant-numeric: tabular-nums; }
+    .audio-wave-region { padding: 0 12px; }
+    .audio-wave-main { position: relative; overflow: hidden; }
+    .audio-wave-main canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+    .audio-playhead { position: absolute; top: 30px; bottom: 0; width: 2px; background: var(--vscode-charts-orange, #edbe6c); pointer-events: none; }
+    .audio-overview { width: 100%; height: 42px; display: block; margin-top: 12px; cursor: pointer; border: 1px solid var(--vscode-widget-border, #3a4255); border-radius: 4px; }
+    .audio-wave-placeholder { min-height: 245px; display: flex; justify-content: center; align-items: center; gap: 16px; padding: 20px; color: var(--wave-muted); }
+    .audio-wave-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: var(--wave-muted); padding: 12px; font-size: 11px; }
+    .audio-transport { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+    .audio-play { background: var(--wave-color); color: var(--vscode-editor-background, #171c28); min-width: 40px; }
+    output { font-variant-numeric: tabular-nums; font-size: 12px; }
+    .audio-seek { flex: 1; min-width: 100px; } .audio-seek input { width: 100%; }
+    .audio-volume { width: 75px; }
+    .audio-selection { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; border-top: 1px solid var(--vscode-widget-border, #3a4255); padding-top: 18px; }
+    .audio-selection > div { flex: 1; min-width: 220px; }
+    .audio-selection p { margin: 7px 0; font-variant-numeric: tabular-nums; }
+    .audio-selection label { display: flex; align-items: center; gap: 7px; }
+    footer { color: var(--wave-muted); margin-top: 25px; font-size: 11px; }
+    .audio-error { color: var(--vscode-errorForeground, #ff9d9d); }
+    .audio-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    @media (max-width: 600px) { padding: 18px 14px; .audio-meta { gap: 16px 22px; } .audio-seek { flex-basis: 100%; order: 2; } h1 { font-size: 18px; } }
+}

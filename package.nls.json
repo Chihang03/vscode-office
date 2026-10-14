@@ -28,5 +28,6 @@
 	"ext.markdown.exportFailed": "Markdown export failed: $1",
 	"ext.markdown.exportRequiresFile": "Select a saved Markdown file (.md or .markdown) on the extension host to export.",
 	"ext.markdown.exportSaveFailed": "The Markdown file could not be saved. PDF export was stopped.",
-	"ext.markdown.openExport": "Open PDF"
+	"ext.markdown.openExport": "Open PDF",
+	"ext.audioViewer": "Kieran Document Studio: Audio Viewer"
 }

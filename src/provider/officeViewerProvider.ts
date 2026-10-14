@@ -5,6 +5,7 @@ import { Handler } from '../common/handler';
 import { Util } from '../common/util';
 import { handleImage, isImage } from './handlers/imageHanlder';
 import { handleSvg } from './handlers/svgHandler';
+import { handleAudio, isAudio } from './handlers/audioHandler';
 import { isVirtualUri, readUriText } from './handlers/officeContent';
 import { handleCommonEvent } from './compress/commonHandler';
 import { TelemetryService } from '@/service/telemetryService';
@@ -22,6 +23,7 @@ export class OfficeViewerProvider implements vscode.CustomReadonlyEditorProvider
 			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.officeViewer', this, viewOption),
 			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.htmlViewer', this, viewOption),
 			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.imageViewer', this, viewOption),
+			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.audioViewer', this, viewOption),
 			vscode.window.registerCustomEditorProvider('kieranDocumentStudio.parquetViewer', this, viewOption),
 		];
 	}
@@ -43,8 +45,12 @@ export class OfficeViewerProvider implements vscode.CustomReadonlyEditorProvider
 		let route: string;
 		const suffix = getFileSuffix(uri.fsPath);
 		const isSvg = /\.svg$/i.test(suffix);
-		handleCommonEvent(uri, handler, isSvg ? { skipOpen: true } : undefined);
-		if (isSvg) {
+		const audio = isAudio(suffix);
+		if (!audio) handleCommonEvent(uri, handler, isSvg ? { skipOpen: true } : undefined);
+		if (audio) {
+			route = 'audio';
+			handleAudio(handler, uri, webview, this.context);
+		} else if (isSvg) {
 			route = 'svg';
 			handleSvg(handler, uri);
 		} else if (isImage(suffix)) {

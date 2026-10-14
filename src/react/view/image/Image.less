@@ -42,9 +42,31 @@
 .image-gallery-content .image-gallery-slide .image-gallery-image {
     width: unset;
     height: unset;
-    max-height: @img-height;
+    max-width: 100%;
+    max-height: 100%;
     transform-origin: center center;
-    transition: transform 0.05s linear;
+    user-select: none;
+    -webkit-user-drag: none;
+    will-change: transform;
+}
+
+.image-viewport {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+
+    &.is-pannable {
+        cursor: grab;
+        touch-action: none;
+    }
+
+    &.is-dragging {
+        cursor: grabbing;
+    }
 }
 
 .image-wheel-toolbar {

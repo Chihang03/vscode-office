@@ -28,5 +28,6 @@
 	"ext.markdown.exportFailed": "Markdown 导出失败：$1",
 	"ext.markdown.exportRequiresFile": "请选择扩展运行环境中已保存的 Markdown 文件（.md 或 .markdown）进行导出。",
 	"ext.markdown.exportSaveFailed": "无法保存 Markdown 文件，已停止 PDF 导出。",
-	"ext.markdown.openExport": "打开 PDF"
+	"ext.markdown.openExport": "打开 PDF",
+	"ext.audioViewer": "Kieran Document Studio：音频查看器"
 }
