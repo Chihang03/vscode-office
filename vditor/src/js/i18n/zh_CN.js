@@ -17,6 +17,7 @@ window.VditorI18n = {
   'code-theme-section-light': '亮色主题',
   'code-theme-section-dark': '暗色主题',
   'mermaid-theme': 'Mermaid 主题',
+  'mermaid-edit': '可视化编辑图表',
   'mermaid-theme-section-system': '系统',
   'mermaid-theme-section-light': '亮色主题',
   'mermaid-theme-section-dark': '暗色主题',

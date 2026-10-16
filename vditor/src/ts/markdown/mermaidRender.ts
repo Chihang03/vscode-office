@@ -41,6 +41,18 @@ const MERMAID_BASE_CONFIG = {
 
 let renderCounter = 0;
 let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+// Mermaid uses global configuration. Serialize initialization and rendering across all diagrams/panels.
+let renderQueue: Promise<unknown> = Promise.resolve();
+
+export const renderMermaidSvg = (code: string, root: HTMLElement, cdn: string, vditor?: IVditor, container?: Element) => {
+    const task = renderQueue.then(async () => {
+        await addScript(`${cdn}/dist/js/mermaid/mermaid.min.js`, "vditorMermaidScript");
+        mermaid.initialize({...MERMAID_BASE_CONFIG, ...buildMermaidInitConfig(getThemeId(root, vditor), root)});
+        return mermaid.render(`vditor-mermaid-${++renderCounter}`, code, container);
+    });
+    renderQueue = task.catch(() => undefined);
+    return task;
+};
 
 const storeMermaidSource = (item: Element, code: string) => {
     if (!item.getAttribute(MERMAID_SOURCE_ATTR) && code.trim()) {
@@ -65,15 +77,16 @@ const clearMermaidElement = (item: HTMLElement) => {
     item.innerHTML = "";
 };
 
-const renderSingleMermaid = async (item: HTMLElement, code: string, index: number) => {
+const renderSingleMermaid = async (item: HTMLElement, code: string, root: HTMLElement, cdn: string, vditor?: IVditor) => {
     clearMermaidElement(item);
-    const renderId = `vditor-mermaid-${++renderCounter}-${Date.now()}-${index}`;
     try {
-        const {svg, bindFunctions} = await mermaid.render(renderId, code, item);
+        const {svg, bindFunctions} = await renderMermaidSvg(code, root, cdn, vditor, item);
+        if (!item.isConnected || getMermaidSource(item).trim() !== code) return;
         item.innerHTML = svg;
         bindFunctions?.(item);
         item.setAttribute(MERMAID_PROCESSED_ATTR, "true");
     } catch (error: unknown) {
+        if (!item.isConnected || getMermaidSource(item).trim() !== code) return;
         const message = error instanceof Error ? error.message : String(error);
         item.className = "language-mermaid vditor-reset--error";
         item.textContent = `mermaid render error: ${message}`;
@@ -92,10 +105,8 @@ const renderMermaidElements = async (
     mermaidElements: NodeListOf<Element>,
     themeRoot: HTMLElement,
     vditor?: IVditor,
+    cdn = Constants.CDN,
 ) => {
-    const themeId = getThemeId(themeRoot, vditor);
-    const themeConfig = buildMermaidInitConfig(themeId, themeRoot);
-    mermaid.initialize({...MERMAID_BASE_CONFIG, ...themeConfig});
     for (let i = 0; i < mermaidElements.length; i++) {
         const item = mermaidElements[i] as HTMLElement;
         if (item.getAttribute(MERMAID_PROCESSED_ATTR) === "true") {
@@ -106,7 +117,7 @@ const renderMermaidElements = async (
             continue;
         }
         storeMermaidSource(item, code);
-        await renderSingleMermaid(item, code, i);
+        await renderSingleMermaid(item, code, themeRoot, cdn, vditor);
         if (vditor) {
             ensureMermaidChrome(vditor, item);
         }
@@ -122,7 +133,7 @@ const doRefreshMermaidTheme = (root: HTMLElement, cdn: string, vditor?: IVditor)
         clearMermaidElement(mermaidElements[i] as HTMLElement);
     }
     addScript(`${cdn}/dist/js/mermaid/mermaid.min.js`, "vditorMermaidScript").then(() => {
-        renderMermaidElements(mermaidElements, root, vditor);
+        renderMermaidElements(mermaidElements, root, vditor, cdn);
     });
 };
 
@@ -144,7 +155,7 @@ export const mermaidRender = (
         themeRoot = (vditorOrThemeRoot as HTMLElement | undefined) ?? findVditorRoot(element);
     }
     addScript(`${cdn}/dist/js/mermaid/mermaid.min.js`, "vditorMermaidScript").then(() => {
-        renderMermaidElements(mermaidElements, themeRoot, vditor);
+        renderMermaidElements(mermaidElements, themeRoot, vditor, cdn);
     });
 };
 

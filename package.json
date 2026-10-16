@@ -909,7 +909,9 @@
 		"test:audio": "node --test test/audio/*.test.cjs",
 		"test:audio:smoke": "node test/audio/audio.smoke.cjs",
 		"test:drawio": "node --test test/drawio/*.test.cjs",
-		"test:drawio:smoke": "node test/drawio/editor.smoke.cjs"
+		"test:drawio:smoke": "node test/drawio/editor.smoke.cjs",
+		"test:mermaid": "node --test test/mermaid/*.test.cjs",
+		"test:mermaid:smoke": "node test/mermaid/editor.smoke.cjs"
 	},
 	"devDependencies": {
 		"@types/diff-match-patch": "1.0.32",

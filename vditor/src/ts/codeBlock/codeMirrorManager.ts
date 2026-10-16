@@ -877,6 +877,31 @@ const syncViewFromCode = (binding: CodeMirrorBinding) => {
     binding.updating = false;
 };
 
+export const getMermaidBlockSource = (block: HTMLElement) =>
+    bindings.get(block)?.view.state.doc.toString() ?? getBlockParts(block)?.code.textContent ?? undefined;
+
+/** Commit one graphical edit through the same source and outer undo history as keyboard editing. */
+export const replaceMermaidBlockSource = (vditor: IVditor, block: HTMLElement, expected: string, source: string) => {
+    const parts = getBlockParts(block);
+    if (!block.isConnected || !parts?.code.classList.contains("language-mermaid") ||
+        (bindings.get(block)?.view.state.doc.toString() ?? parts.code.textContent ?? "").trimEnd() !== expected.trimEnd()) {
+        return false;
+    }
+    // Restore preview layout and pointer events if the source editor was open before the modal.
+    exitSpecialBlockEdit(vditor, block);
+    deactivateAllCodeMirrors(vditor);
+    const record = vditor.currentMode === "ir" ? recordIrHistory : recordWysiwygHistory;
+    if (vditor.currentMode === "ir") clearTimeout(vditor.ir.processTimeoutId);
+    else clearTimeout(vditor.wysiwyg.afterRenderTimeoutId);
+    record(vditor, {enableAddUndoStack: true, enableInput: true});
+    const current = getBlockParts(block);
+    if (!current) return false;
+    current.code.textContent = source;
+    if (current.preview) rerenderSpecialPreview(current.preview, vditor, source);
+    record(vditor, {enableAddUndoStack: true, enableInput: true});
+    return true;
+};
+
 const insertLiteralTab = (view: EditorView) => {
     view.dispatch(view.state.update(view.state.replaceSelection("\t"), {
         scrollIntoView: true,

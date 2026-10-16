@@ -35,6 +35,10 @@ Kieran Document Studio includes a full Git History workspace for exploring repos
 
 This extension replaces the default Markdown editor with a WYSIWYG editor.
 
+Hover over a Mermaid diagram and choose **Edit diagram visually** to edit flowchart nodes, edges, labels, shapes, colours, stroke widths and layout direction. Use **Connect** and select two nodes, or drag between nodes, to add an edge. The properties panel also supports subgraph creation, renaming, deletion and membership changes. Selecting a shape locates its source; moving the source caret locates the corresponding shape.
+
+The editor includes draft undo/redo, source editing and live preview. **Apply** updates the original standard `mermaid` code block as an undoable document edit; **Cancel** discards the draft. Visual editing covers common `flowchart` / `graph` syntax, while other diagram types and advanced syntax retain source editing and preview. Most property edits preserve surrounding source; membership changes reorganise structural declarations while retaining comments, configuration and styles. Mermaid computes the layout automatically. If the original block changes while the panel is open, the draft is retained and a stale overwrite is refused.
+
 To use the built-in VS Code Markdown editor instead, add this to your `settings.json`:
 
 ```json

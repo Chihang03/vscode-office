@@ -6,6 +6,7 @@ import { buildMermaidThemePickerPanelHTML, refreshMermaidThemePickerPanel } from
 import { codicon } from "../util/codicon";
 import { svgAsPngUri } from "save-svg-as-png";
 import { showToast } from "../ui/toast";
+import { openMermaidEditor } from "../mermaid/mermaidEditor";
 
 const MERMAID_HOST_CLASS = "vditor-mermaid-host";
 const MERMAID_CHROME_CLASS = "vditor-mermaid-chrome";
@@ -108,6 +109,14 @@ const createMermaidChrome = () => {
 
     actions.appendChild(themeWrap);
 
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "vditor-mermaid-chrome__edit-btn";
+    editBtn.setAttribute("aria-label", window.VditorI18n["mermaid-edit"] || "Edit diagram");
+    editBtn.title = editBtn.getAttribute("aria-label")!;
+    editBtn.innerHTML = codicon("edit");
+    actions.prepend(editBtn);
+
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
     copyBtn.className = "vditor-mermaid-chrome__copy-btn";
@@ -118,7 +127,7 @@ const createMermaidChrome = () => {
     toolbar.appendChild(actions);
     chromeRoot.appendChild(toolbar);
 
-    return { chromeRoot, themeWrap, themeTrigger, themePanel, copyBtn };
+    return { chromeRoot, themeWrap, themeTrigger, themePanel, copyBtn, editBtn };
 };
 
 export const ensureMermaidHost = (mermaidElement: HTMLElement) => {
@@ -174,6 +183,12 @@ export const ensureMermaidChrome = (vditor: IVditor, mermaidElement: HTMLElement
         setThemePanelOpen(vditor, chrome!, !isOpen);
     });
     bindThemePanel(vditor, chrome);
+    created.editBtn.addEventListener("mousedown", event => { event.preventDefault(); event.stopPropagation(); });
+    created.editBtn.addEventListener("click", event => {
+        event.preventDefault(); event.stopPropagation(); closeThemePanel();
+        openMermaidEditor(vditor, mermaidElement);
+    });
+    created.editBtn.hidden = !mermaidElement.closest('[data-type="code-block"]');
 
     created.copyBtn.addEventListener("mousedown", (event) => {
         event.preventDefault();

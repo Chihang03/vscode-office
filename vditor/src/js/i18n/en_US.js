@@ -17,6 +17,7 @@ window.VditorI18n = {
   'code-theme-section-light': 'Light Themes',
   'code-theme-section-dark': 'Dark Themes',
   'mermaid-theme': 'Mermaid Theme',
+  'mermaid-edit': 'Edit diagram visually',
   'mermaid-theme-section-system': 'System',
   'mermaid-theme-section-light': 'Light Theme',
   'mermaid-theme-section-dark': 'Dark Theme',
