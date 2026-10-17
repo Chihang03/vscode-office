@@ -1,5 +1,6 @@
 // Run after npm run build. Uses the actual production webview and inline worker.
-// Browser plugin was unavailable; use an existing Playwright runtime, without adding a dependency.
+// Uses an existing Playwright runtime, without adding a dependency.
+// Disable physical audio output so playback-clock checks do not depend on the host audio device.
 const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const os=require('node:os');const http=require('node:http');const {execFileSync}=require('node:child_process');
 const {chromium}=require(process.env.KIERAN_PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'../..');const output=fs.mkdtempSync(path.join(os.tmpdir(),'studio-audio-'));const fixtures=path.join(output,'fixtures');fs.mkdirSync(fixtures);
@@ -7,6 +8,7 @@ const cases=[],errors=[],codecResults=[];
 function generate(){
  const ffmpeg=process.env.KIERAN_FFMPEG||'/opt/homebrew/bin/ffmpeg';
  execFileSync(ffmpeg,['-v','error','-f','lavfi','-i','aevalsrc=0.6*sin(2*PI*440*t)*(0.4+0.6*sin(2*PI*0.7*t)^2)|0.35*sin(2*PI*220*t)*(0.2+0.8*sin(2*PI*0.25*t)^2):s=22050:d=10','-c:a','pcm_s16le',path.join(fixtures,'stereo.wav')]);
+ execFileSync(ffmpeg,['-v','error','-f','lavfi','-i','aevalsrc=0.25*(1+0.8*cos(2*PI*37*t))*cos(2*PI*1000*t)|0.25*(1+0.8*cos(2*PI*47*t))*cos(2*PI*1000*t):s=48000:d=12','-c:a','pcm_s16le',path.join(fixtures,'assr.wav')]);
  for(const [name,codec] of [['sample.mp3','libmp3lame'],['sample.flac','flac'],['sample.ogg','vorbis'],['sample.m4a','aac'],['mono24.wav','pcm_s24le'],['float.wav','pcm_f32le']])execFileSync(ffmpeg,['-v','error','-i',path.join(fixtures,'stereo.wav'),...(name==='mono24.wav'?['-ac','1']:[]),'-c:a',codec,'-strict','-2',path.join(fixtures,name)]);
  execFileSync(ffmpeg,['-v','error','-f','lavfi','-i','anullsrc=r=44100:cl=mono','-t','420','-c:a','pcm_s16le',path.join(fixtures,'long.wav')]);
  fs.writeFileSync(path.join(fixtures,'broken.wav'),fs.readFileSync(path.join(fixtures,'stereo.wav')).subarray(0,100));
@@ -25,10 +27,11 @@ async function main(){
   fs.createReadStream(file,{start,end}).pipe(res);
  });await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=`http://127.0.0.1:${server.address().port}`;let browser;
  try{
-  browser=await chromium.launch({executablePath:process.env.KIERAN_AUDIO_CHROMIUM_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+  browser=await chromium.launch({executablePath:process.env.KIERAN_AUDIO_CHROMIUM_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--disable-audio-output']});
   const context=await browser.newContext({viewport:{width:1280,height:900}});
   await context.addInitScript(()=>{
-   window.hostMessages=[];window.acquireVsCodeApi=()=>({postMessage(message){window.hostMessages.push(message);if(message.type==='audioPosition'&&window.currentResource){localStorage.setItem('test-position:'+window.currentResource.id,String(message.content.time));}if(message.type==='audioInit'){const name=new URLSearchParams(location.search).get('file')||'stereo.wav';const size=Number(new URLSearchParams(location.search).get('size'))||0;window.currentResource={id:name,version:name+':'+(new URLSearchParams(location.search).get('version')||'1'),fileName:name,ext:'.'+name.split('.').pop(),mime:'audio/'+(name.endsWith('.wav')?'wav':'mpeg'),size,src:location.origin+'/fixtures/'+name,resumeTime:Number(localStorage.getItem('test-position:'+name))||0};setTimeout(()=>window.postMessage({type:'audio',content:window.currentResource},'*'),0);}},getState(){return{}},setState(){}});
+   const OriginalWorker=window.Worker;window.Worker=class extends OriginalWorker{postMessage(...args){if(args[0]?.options)window.analysisWorkerStarts=(window.analysisWorkerStarts||0)+1;return super.postMessage(...args);}constructor(...args){super(...args);this.addEventListener('message',event=>{if(event.data?.type==='ready'&&event.data.result?.spectrum)window.lastAudioAnalysis=event.data.result;});}};
+   window.hostMessages=[];window.acquireVsCodeApi=()=>({postMessage(message){window.hostMessages.push(message);if(message.type==='audioAnalysisSettings')localStorage.setItem('test-analysis-settings',JSON.stringify(message.content));if(message.type==='audioPosition'&&window.currentResource){localStorage.setItem('test-position:'+window.currentResource.id,String(message.content.time));}if(message.type==='audioInit'){const name=new URLSearchParams(location.search).get('file')||'stereo.wav';const size=Number(new URLSearchParams(location.search).get('size'))||0;window.currentResource={id:name,version:name+':'+(new URLSearchParams(location.search).get('version')||'1'),fileName:name,ext:'.'+name.split('.').pop(),mime:'audio/'+(name.endsWith('.wav')?'wav':'mpeg'),size,analysisSettings:JSON.parse(localStorage.getItem('test-analysis-settings')||'null'),src:location.origin+'/fixtures/'+name,resumeTime:Number(localStorage.getItem('test-position:'+name))||0};setTimeout(()=>window.postMessage({type:'audio',content:window.currentResource},'*'),0);}},getState(){return{}},setState(){}});
   });
   async function open(name='stereo.wav',version='1'){
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
@@ -36,11 +39,12 @@ async function main(){
    assert.equal(await page.title(),'Kieran Document Studio');await page.locator('h1').waitFor();assert.equal(await page.locator('vite-error-overlay').count(),0);assert.equal(await page.locator('h1').textContent(),name);return page;
   }
   async function ready(page){await page.getByTestId('waveform').waitFor({timeout:25000});}
+  if(process.env.KIERAN_AUDIO_ANALYSIS_ONLY){await require('./analysis.scenarios.cjs')({open,ready,cases,output});assert.deepEqual(errors,[]);const result={status:'passed',output,language:process.env.KIERAN_AUDIO_LANGUAGE||'en',cases,errors};fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));return;}
   const page=await open();await ready(page);
   assert.ok((await page.locator('.audio-meta').innerText()).includes('22,050 Hz'));assert.ok((await page.locator('.audio-meta').innerText()).includes('16 bit'));
   assert.ok(await page.evaluate(()=>document.querySelector('audio').paused&&document.querySelector('audio').currentTime===0));cases.push('Production route/inline worker: original 22050 Hz stereo PCM16 metadata; no autoplay');
   await page.screenshot({path:path.join(output,'desktop-waveform.png')});
-  await page.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>document.querySelector('audio').currentTime>.25);await page.getByRole('button',{name:'Pause',exact:true}).click();
+  await page.getByRole('button',{name:'Play',exact:true}).click();await page.waitForFunction(()=>document.querySelector('audio').currentTime>.25,null,{timeout:10000}).catch(async error=>{console.error('Playback diagnostics:',await page.evaluate(()=>{const a=document.querySelector('audio');return{paused:a.paused,time:a.currentTime,ready:a.readyState,network:a.networkState,error:a.error?.message,src:a.currentSrc,alerts:Array.from(document.querySelectorAll('[role=alert]'),e=>e.textContent)};}));throw error;});await page.getByRole('button',{name:'Pause',exact:true}).click();
   const paused=await page.evaluate(()=>document.querySelector('audio').currentTime);await page.waitForTimeout(150);assert.ok(Math.abs(await page.evaluate(()=>document.querySelector('audio').currentTime)-paused)<.05);cases.push('Real HTML audio plays after click and pauses without drifting');
   await page.getByLabel('Speed',{exact:true}).selectOption('1.5');assert.equal(await page.evaluate(()=>document.querySelector('audio').playbackRate),1.5);
   await page.getByRole('button',{name:'Mute',exact:true}).click();assert.equal(await page.evaluate(()=>document.querySelector('audio').muted),true);await page.getByRole('button',{name:'Unmute',exact:true}).click();
@@ -70,8 +74,9 @@ async function main(){
   const long=await open('long.wav');await ready(long);assert.ok((await long.locator('.audio-meta').innerText()).includes('07:00.000'));cases.push('35 MiB PCM WAV generates bounded streamed waveform beyond generic decode limit');await long.close();
   const broken=await open('broken.wav');await broken.waitForFunction(()=>document.querySelector('[data-testid="wave-status"]')?.textContent.includes('incomplete'));assert.equal(await broken.getByTestId('waveform').count(),0);cases.push('Truncated PCM produces explicit waveform error, no fake waveform');await broken.close();
   const cancel=await open('long.wav','cancel');await cancel.getByRole('button',{name:'Cancel waveform',exact:true}).click();await cancel.waitForFunction(()=>document.querySelector('[data-testid="wave-status"]')?.textContent.includes('cancelled'));assert.equal(await cancel.getByTestId('waveform').count(),0);cases.push('Cancel terminates waveform work while native audio remains available');await cancel.close();
+  await require('./analysis.scenarios.cjs')({open,ready,cases,output});
   assert.deepEqual(errors,[]);cases.push('No uncaught browser errors or framework error overlays');
-  const result={status:'passed',output,baseUrl:base,browser:'Google Chrome / production webview + native audio + inline worker',cases,codecResults,errors};fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
+  const result={status:'passed',output,baseUrl:base,browser:'Google Chrome / production webview + HTML audio + inline workers; physical output disabled',cases,codecResults,errors};fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
  }finally{await browser?.close();await new Promise(r=>server.close(r));}
 }
 main().catch(e=>{console.error(e);console.error('Test output:',output);process.exitCode=1;});

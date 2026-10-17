@@ -44,3 +44,27 @@
     .audio-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     @media (max-width: 600px) { padding: 18px 14px; .audio-meta { gap: 16px 22px; } .audio-seek { flex-basis: 100%; order: 2; } h1 { font-size: 18px; } }
 }
+
+.studio-audio .audio-analysis {
+    margin-top: 22px;
+    .audio-analysis-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px; }
+    .audio-analysis-heading > span, p, .audio-analysis-note { color: var(--wave-muted); font-size: 11px; line-height: 1.7; }
+    #audio-analysis-content { padding: 0 12px 12px; }
+    h2 { font-size: 14px; font-weight: 600; margin: 18px 0 6px; }
+    .audio-analysis-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 8px 0; }
+    .audio-analysis-controls label { display: flex; flex-direction: column; gap: 5px; font-size: 11px; }
+    input { width: 110px; max-width: 100%; color: inherit; background: var(--vscode-input-background, #242b3c); border: 1px solid var(--vscode-widget-border, #3a4255); border-radius: 4px; padding: 6px; font: inherit; }
+    .audio-analysis-status { display: flex; gap: 12px; align-items: center; margin: 10px 0; color: var(--wave-muted); }
+    .audio-analysis-legend { display: flex; gap: 18px; font-size: 12px; }
+    canvas { display: block; width: 100%; }
+    .audio-spectrum-plot canvas { height: 205px; cursor: crosshair; }
+    .audio-analysis-readout { display: block; min-height: 34px; padding: 7px 0; font-size: 11px; color: var(--wave-muted); overflow-wrap: anywhere; }
+    .audio-spectrogram-image { position: relative; overflow: hidden; }
+    .audio-spectrogram canvas { touch-action: none; cursor: crosshair; }
+    .audio-spectral-playhead { position: absolute; top: 0; bottom: 25px; width: 2px; background: #fff; pointer-events: none; }
+    .audio-heat-legend { display: flex; align-items: center; gap: 10px; font-size: 10px; margin: 8px 0 0; }
+    .audio-heat-legend i { width: 130px; height: 8px; background: linear-gradient(to right, #090f20, #302370, #ad3085, #f57b41, #ffef97); }
+    .audio-marker-control { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 11px; }
+    .audio-analysis-invalid { opacity: .45; }
+    .audio-error { color: var(--vscode-errorForeground, #ff9d9d); }
+}

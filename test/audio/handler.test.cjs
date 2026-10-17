@@ -1,6 +1,6 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const path=require('node:path');const {build}=require('esbuild');
 async function setup(overrides={}) {
- const state={messages:[],read:0,data:new Uint8Array([1,2]),stat:{mtime:5,size:2},positions:{},...overrides};
+ const state={messages:[],read:0,data:new Uint8Array([1,2]),stat:{mtime:5,size:2},positions:{},analysisSettings:undefined,...overrides};
  const result=await build({entryPoints:[path.resolve(__dirname,'../../src/provider/handlers/audioHandler.ts')],bundle:true,platform:'node',format:'cjs',write:false,plugins:[{name:'mock',setup(b){
   b.onResolve({filter:/^(vscode|\.\/officeContent)$/},a=>({path:a.path,namespace:'mock'}));
   b.onLoad({filter:/.*/,namespace:'mock'},a=>({contents:a.path==='vscode'?`export const workspace={fs:{stat:async()=>state.stat}}; export const commands={executeCommand(){}};`:`export const readUriBytes=async()=>{state.read++;return state.data};export const bytesToPayloadBuffer=bytes=>Array.from(bytes);`,loader:'js'}));
@@ -9,7 +9,7 @@ async function setup(overrides={}) {
  const callbacks={};const handler={on(type,fn){callbacks[type]=fn;return this;},emit(type,content){state.messages.push({type,content});return this;}};
  const uri={scheme:state.scheme||'file',fsPath:'/audio/TEST.WAV',toString:()=>`${state.scheme||'file'}:///audio/TEST.WAV`};
  const webview={asWebviewUri(){return {with({query}){return {toString:()=>`https://local/TEST.WAV?${query}`};}};}};
- const ext={workspaceState:{get:()=>state.positions,update:async(key,value)=>{state.positions=value;}}};
+ const ext={globalState:{get:()=>state.analysisSettings,update:async(key,value)=>{state.analysisSettings=value;}},workspaceState:{get:()=>state.positions,update:async(key,value)=>{state.positions=value;}}};
  context.module.exports.handleAudio(handler,uri,webview,ext);
  return {state,callbacks,isAudio:context.module.exports.isAudio};
 }
@@ -22,4 +22,14 @@ test('Virtual audio buffers are capped and source position survives reopening',a
 });
 test('Disposed or superseded async requests never publish stale payloads',async()=>{
  const {state,callbacks}=await setup();const first=callbacks.audioInit();const second=callbacks.fileChange();await Promise.all([first,second]);assert.equal(state.messages.length,1);const pending=callbacks.audioInit();callbacks.dispose();await pending;assert.equal(state.messages.length,1);
+});
+
+test('Analysis preferences survive a new viewer; invalid payloads do not replace valid settings',async()=>{
+ const first=await setup();const settings={channel:'both',fftSize:65536,minFrequency:900,maxFrequency:1100,logarithmic:true,markers:'37, 47'};
+ await first.callbacks.audioAnalysisSettings({...settings,expanded:true,spectrum:[1,2,3]});
+ assert.equal(first.state.analysisSettings.fftSize,65536);assert.equal(first.state.analysisSettings.expanded,undefined);assert.equal(first.state.analysisSettings.spectrum,undefined);
+ const reopened=await setup({analysisSettings:first.state.analysisSettings});await reopened.callbacks.audioInit();assert.equal(reopened.state.messages[0].content.analysisSettings.markers,'37, 47');
+ await reopened.callbacks.audioAnalysisSettings({...settings,fftSize:100});await reopened.callbacks.audioAnalysisSettings({...settings,minFrequency:2000});await reopened.callbacks.audioAnalysisSettings({...settings,markers:'x'.repeat(129)});
+ assert.equal(reopened.state.analysisSettings.fftSize,65536);assert.equal(reopened.state.analysisSettings.minFrequency,900);
+ const broken=await setup({analysisSettings:{channel:'both'}});await broken.callbacks.audioInit();assert.equal(broken.state.messages[0].content.analysisSettings,undefined);
 });

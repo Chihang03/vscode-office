@@ -4,6 +4,7 @@ import { handler } from '../../util/vscode';
 import { clampView, formatTime, type AudioResource, type Selection, type TimeView } from './audioModel';
 import { useWaveform } from './useWaveform';
 import Waveform from './Waveform';
+import AudioAnalysis from './AudioAnalysis';
 import './AudioViewer.less';
 
 const t = (key: string) => $t(`audio.${key}`);
@@ -16,6 +17,8 @@ function AudioDocument({ resource }: { resource: AudioResource }) {
     const activeLoop = useRef({ loop, selection });
     useEffect(() => { activeLoop.current = { loop, selection }; }, [loop, selection]);
     const waveform = useWaveform(resource, url, duration, !!playError);
+    const encoding = waveform.metadata?.encoding;
+    const encodingLabel = encoding === 'IEEE float' ? t('floatEncoding') : encoding === 'Decoded audio' ? t('decodedEncoding') : encoding;
     const trackDuration = waveform.metadata?.duration || duration;
     useEffect(() => () => { if (url.startsWith('blob:')) URL.revokeObjectURL(url); }, [url]);
     useEffect(() => {
@@ -61,7 +64,7 @@ function AudioDocument({ resource }: { resource: AudioResource }) {
             <div><span>{t('size')}</span><strong>{resource.size == null ? '—' : `${(resource.size / 1024 / 1024).toFixed(2)} MB`}</strong></div>
             <div><span>{t(waveform.metadata?.original ? 'sourceRate' : 'decodedRate')}</span><strong>{waveform.metadata ? `${waveform.metadata.sampleRate.toLocaleString()} Hz` : '—'}</strong></div>
             <div><span>{t('channels')}</span><strong>{waveform.metadata?.channels || '—'}</strong></div>
-            <div><span>{t('encoding')}</span><strong>{waveform.metadata ? `${waveform.metadata.encoding}${waveform.metadata.bits ? ` · ${waveform.metadata.bits} bit` : ''}` : '—'}</strong></div>
+            <div><span>{t('encoding')}</span><strong>{waveform.metadata ? `${encodingLabel}${waveform.metadata.bits ? ` · ${waveform.metadata.bits} ${t('bitUnit')}` : ''}` : '—'}</strong></div>
         </section>
         <section className="audio-panel">
             <div className="audio-toolbar"><div className="audio-mode"><button aria-pressed={mode === 'select'} onClick={() => setMode('select')}>{t('select')}</button><button aria-pressed={mode === 'pan'} onClick={() => setMode('pan')}>{t('pan')}</button></div>
@@ -84,8 +87,9 @@ function AudioDocument({ resource }: { resource: AudioResource }) {
             <label><input type="checkbox" aria-label={t('loop')} checked={loop} disabled={!selection || selection.end - selection.start < .05} onChange={e => { setLoop(e.target.checked); if (e.target.checked && selection) seek(selection.start); }}/>{t('loop')}</label>
             <button disabled={!selection} onClick={() => { setSelection(null); setLoop(false); }}>{t('clearSelection')}</button>
         </section>
+        {waveform.data && <AudioAnalysis resource={resource} metadata={waveform.data.metadata} view={view} selection={selection} position={position} onSeek={seek} onSelection={range => { setSelection(range); if (!range || range.end - range.start < .05) setLoop(false); }}/>}
         {playError && <p className="audio-error" role="alert">{playError}</p>}
-        <footer>{t('readOnly')}</footer>
+        {t('readOnly') && <footer>{t('readOnly')}</footer>}
     </main>;
 }
 export default function AudioViewer() {

@@ -1,5 +1,6 @@
 import { basename, extname } from 'path';
 import * as vscode from 'vscode';
+import { parseAudioAnalysisSettings } from '@/common/audioAnalysisSettings';
 import { Handler } from '@/common/handler';
 import { bytesToPayloadBuffer, readUriBytes } from './officeContent';
 
@@ -9,6 +10,8 @@ const AUDIO_MIME: Record<string, string> = {
     '.m4a': 'audio/mp4', '.aac': 'audio/aac', '.aif': 'audio/aiff', '.aiff': 'audio/aiff',
     '.webm': 'audio/webm',
 };
+const ANALYSIS_SETTINGS_KEY = 'kieranDocumentStudio.audioAnalysisSettings';
+let analysisSettingsUpdates = Promise.resolve();
 const POSITION_KEY = 'kieranDocumentStudio.audioPositions';
 const VIRTUAL_AUDIO_LIMIT = 16 * 1024 * 1024;
 let positionUpdates = Promise.resolve();
@@ -24,12 +27,14 @@ export function handleAudio(handler: Handler, uri: vscode.Uri, webview: vscode.W
         const request = ++requestId;
         try {
             const stat = await vscode.workspace.fs.stat(uri).catch(() => undefined);
+            await analysisSettingsUpdates.catch(() => {});
             const positions = context.workspaceState.get<Record<string, { time: number; updated: number }>>(POSITION_KEY, {});
             const payload: Record<string, unknown> = {
                 id, fileName: basename(uri.fsPath), ext: extname(uri.fsPath).toLowerCase(),
                 mime: AUDIO_MIME[extname(uri.fsPath).toLowerCase()], size: stat?.size,
                 version: `${id}:${stat?.mtime ?? 0}:${stat?.size ?? 0}`,
                 resumeTime: positions[id]?.time ?? 0,
+                analysisSettings: parseAudioAnalysisSettings(context.globalState.get(ANALYSIS_SETTINGS_KEY)),
             };
             if (uri.scheme === 'file') {
                 payload.src = webview.asWebviewUri(uri).with({ query: `version=${stat?.mtime ?? Date.now()}` }).toString();
@@ -46,6 +51,12 @@ export function handleAudio(handler: Handler, uri: vscode.Uri, webview: vscode.W
         }
     };
     handler.on('audioInit', send).on('fileChange', send);
+    handler.on('audioAnalysisSettings', (payload: unknown) => {
+        const settings = parseAudioAnalysisSettings(payload);
+        if (!settings) return;
+        analysisSettingsUpdates = analysisSettingsUpdates.catch(() => {}).then(() => context.globalState.update(ANALYSIS_SETTINGS_KEY, settings));
+        return analysisSettingsUpdates;
+    });
     handler.on('audioPosition', (payload: { time?: number }) => {
         if (!Number.isFinite(payload?.time) || payload.time! < 0 || payload.time! > 7 * 24 * 3600) return;
         const time = payload.time!;
