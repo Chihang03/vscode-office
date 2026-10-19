@@ -15,12 +15,14 @@ jobs:
       with:
         node-version: 24
         cache: npm
+    - id: manifest
+      run: node -p "'version=' + require('./package.json').version" >> "$GITHUB_OUTPUT"
     - run: npm ci --no-audit --no-fund
-    - run: npm run package -- --out kieran-document-studio.vsix
+    - run: npm run package
     - run: npm run test:pdf
     - run: npm run test:audio
     - run: npm run test:drawio
     - uses: actions/upload-artifact@v4
       with:
-        name: kieran-document-studio
-        path: kieran-document-studio.vsix
+        name: kieran-document-studio-${{ steps.manifest.outputs.version }}
+        path: ../outputs/vsix/kieran-document-studio-${{ steps.manifest.outputs.version }}.vsix

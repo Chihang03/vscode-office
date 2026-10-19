@@ -27,6 +27,7 @@ pnpm-workspace.yaml
 !package.nls*.json
 scripts/**
 .github/**
+AGENTS.md
 docs/**
 image/README*/**
 image/logo.png

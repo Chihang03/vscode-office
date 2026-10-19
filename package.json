@@ -2,7 +2,7 @@
 	"name": "kieran-document-studio",
 	"displayName": "Kieran Document Studio（文档工作台）",
 	"description": "Kieran Dai 独立维护的社区 fork：在 VS Code 中查看办公文档、编辑 Markdown，并浏览 Git 历史。",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"publisher": "chihang03",
 	"icon": "image/kieran-document-studio.png",
 	"engines": {
@@ -899,7 +899,7 @@
 		"dev:web": "OFFICE_EXTENSION_TARGET=web vite --mode=development",
 		"lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
 		"build": "vite build --mode=production",
-		"package": "vsce package --no-dependencies --githubBranch main",
+		"package": "node -e \"require('fs').mkdirSync('../outputs/vsix', { recursive: true })\" && vsce package --no-dependencies --githubBranch main --out ../outputs/vsix",
 		"vscode:prepublish": "npm run check:identity && npm run build",
 		"check:identity": "node scripts/check-identity.cjs",
 		"test:pdf": "node --test test/pdf/export.test.cjs",

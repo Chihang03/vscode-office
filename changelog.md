@@ -1,3 +1,17 @@
+# 0.1.7 2026-10-19
+
+本版补记并正式汇总 `22af6d1d`（2026-10-16，Mermaid 可视化编辑）与 `6c3ba3a8`（2026-10-18，WAV 分析及参数记忆）。这两次提交当时仍沿用 `0.1.6`，且未同步更新日志；这里按本次实际交付版本记录。
+
+- 新增 WAV 音频分析面板，直接读取未压缩 PCM／IEEE 浮点原始采样，提供 FFT 频谱、声谱图与调制频谱，支持单声道查看和左右声道对比。
+- 支持选择 FFT 点数、频率范围、线性／对数坐标，以及 900–1,100 Hz 载波快捷范围；频谱与选区联动，声谱图跟随波形缩放和平移，并支持点击定位与拖动选区。
+- 调制频谱在所选频段提取希尔伯特包络，提供 0–120 Hz 视图和可配置的参考频率，便于检查 37 Hz、47 Hz 等调幅刺激。
+- 分析面板默认收起，展开后才启动后台计算；支持取消、重新计算与收起时停止任务，当前预览内缓存最近三组分析结果。
+- 自动记住 FFT 点数、声道、频率范围、坐标和调制参考频率，换文件或重启后恢复；针对单声道和较低采样率适配不兼容参数，初始适配不会覆盖保存的偏好。
+- 补齐简体／繁体中文分析界面、幅度单位和频点间隔说明，改善窄窗口刻度与参考线标签布局；区间频谱最多取 64 个窗口，声谱图最多取 160 个窗口，包络分析最多取起始 8 秒或 524,288 点。
+- 新增 Markdown Mermaid 流程图的可视化编辑功能。
+- 统一使用 `kieran-document-studio-<version>.vsix` 命名，所有安装包输出到工作区 `outputs/vsix/`，截图与测试记录另存同名版本目录；取消功能后缀，并在 AGENTS.md 中明确版本递增与更新日志要求。
+- 核对独立维护以来的提交与本地安装包，补记 0.1.0 的焦点修复和品牌调整，并说明 0.1.4 的版本提交缺口。
+
 # 0.1.6 2026-10-14
 
 - Add offline editing of .drawio, .dio, .drawio.svg and .drawio.png using the pinned draw.io 32.4.1 engine and an independent VS Code adapter.
@@ -15,6 +29,8 @@
 - Include the pending image zoom/pan fix from 0.1.4 and preserve the current independent brand and logo.
 
 # 0.1.4 2026-10-14
+
+历史记录补充：保留的本地安装包内部版本为 `0.1.4`，但 Git 中没有独立的 `0.1.4` 版本提交；以下图片改动随后随 `cd16e0db` 一并提交到 `0.1.5`。
 
 - Pan zoomed images by dragging, with bounded movement and grab/grabbing cursors.
 - Zoom around the pointer; double-click or use Fit to restore the centered view.
@@ -54,6 +70,17 @@
 - Remove inherited author/sponsorship claims and the upstream telemetry connection.
 - Remove the inherited migration that deleted shared VS Code WebStorage.
 - Retain upstream MIT copyright, source history and third-party notices.
+- 历史补记：`246732bf`（2026-10-11）修复关闭“关于”面板后编辑器焦点恢复不可用的问题。
+- 历史补记：`cddf638d`（2026-10-11）补齐 Webview 标题、Git 历史界面及主题中的独立品牌信息。
+
+## 独立品牌建立前的开发分支补记
+
+以下记录来自 `feat/markdown-pdf-export`。本次核对（2026-10-19）时，这些提交不在当前分支的提交链中；版本号是该开发分支当时的内部版本，不作为 Kieran Document Studio 的正式版本序列。
+
+- `4.2.1`，2026-10-10，`632688fe`：新增 Markdown PDF 导出并初始化当时的开发 fork；原提交未更新日志。
+- `4.2.2`，2026-10-10，`2ba7250c`：新增 PDF 页眉、页码并移除自动目录；原提交未更新日志。
+- `4.2.2`，2026-10-10，`3c85fce5`：在 PDF 集成测试前构建导出模板，属于该开发版本的 CI 调整。
+- 另保留一份内部版本为 `4.2.3` 的本地安装包，但所核对的分支历史中没有对应版本提交；该包作为历史构建归档保留。
 
 ## Upstream history (retained)
 
