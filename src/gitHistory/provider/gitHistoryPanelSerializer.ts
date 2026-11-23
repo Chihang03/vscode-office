@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { CommitService } from '../service/commitService';
+import type { DevLogExportService } from '../service/devLogExportService';
 import type { GitActions } from '../service/gitActions';
 import type { RepoDiscovery } from '../service/repoDiscovery';
 import type { GitActionHandler } from './gitActionHandler';
@@ -12,7 +13,8 @@ export class GitHistoryPanelSerializer implements vscode.WebviewPanelSerializer<
         private readonly commitService: CommitService,
         private readonly repoDiscovery: RepoDiscovery,
         private readonly gitActions: GitActions,
-        private readonly gitActionHandler: GitActionHandler
+        private readonly gitActionHandler: GitActionHandler,
+        private readonly devLogExportService: DevLogExportService,
     ) { }
 
     async deserializeWebviewPanel(
@@ -27,6 +29,7 @@ export class GitHistoryPanelSerializer implements vscode.WebviewPanelSerializer<
             this.repoDiscovery,
             this.gitActions,
             this.gitActionHandler,
+            this.devLogExportService,
             panelContext
         );
     }

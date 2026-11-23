@@ -6,6 +6,7 @@ interface SelectionActionBarProps {
     onCopyMessages: () => void;
     onCherryPick: () => void;
     onRevert: () => void;
+    onExportDevLog: () => void;
     onClear: () => void;
 }
 
@@ -15,6 +16,7 @@ export default function SelectionActionBar({
     onCopyMessages,
     onCherryPick,
     onRevert,
+    onExportDevLog,
     onClear,
 }: SelectionActionBarProps) {
     if (count < 2) {
@@ -40,6 +42,10 @@ export default function SelectionActionBar({
                 <button type="button" className="git-graph-selection-bar-btn git-graph-selection-bar-btn-danger" onClick={onRevert}>
                     <span className="codicon codicon-discard" aria-hidden />
                     {$t('git.revert')}
+                </button>
+                <button type="button" className="git-graph-selection-bar-btn" onClick={onExportDevLog}>
+                    <span className="codicon codicon-export" aria-hidden />
+                    {$t('git.devLog.exportBtn')}
                 </button>
                 <button type="button" className="git-graph-selection-bar-btn git-graph-selection-bar-btn-ghost" onClick={onClear}>
                     {$t('git.clear')}

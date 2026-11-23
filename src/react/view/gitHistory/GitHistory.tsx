@@ -4,7 +4,9 @@ import { Alert, ConfigProvider, Spin } from 'antd';
 import { handler } from '../../util/vscode';
 import { $t } from '../../i18n/i18nConfig';
 import ActionDialog from './components/ActionDialog';
+import DevLogExportDialog from './components/DevLogExportDialog';
 import RemoteFormDialog from './components/RemoteFormDialog';
+import type { DevLogTemplate } from './util/devLogRenderer';
 import { useGitActionPrompt } from './hooks/useGitActionPrompt';
 import { useSplitViewLayout } from './hooks/useSplitViewLayout';
 import type { PromptStep, GitActionRequest, PromptSubmitValue } from './util/gitActionPromptFlow';
@@ -178,6 +180,11 @@ function GitHistoryView({
     const [remoteForm, setRemoteForm] = useState<{ mode: 'add' | 'edit'; remote?: GitRemoteDetail } | null>(null);
     const [remoteDeleteName, setRemoteDeleteName] = useState<string | null>(null);
     const [batchConfirm, setBatchConfirm] = useState<{ kind: 'cherryPick' | 'revert'; commits: GitCommit[] } | null>(null);
+    const [devLogModal, setDevLogModal] = useState<{ open: boolean; template: DevLogTemplate; useSelection: boolean }>({
+        open: false,
+        template: 'timeline',
+        useSelection: false,
+    });
     const contentRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<HTMLDivElement>(null);
     const bodyRef = useRef<HTMLDivElement>(null);
@@ -1522,6 +1529,7 @@ function GitHistoryView({
                 onExpandLayout={handleExpandLayout}
                 adaptiveColorMode={adaptiveColorMode}
                 onToggleColorMode={onToggleColorMode}
+                onExportDevLog={(template) => setDevLogModal({ open: true, template, useSelection: false })}
             />
             <div className="git-graph-body" ref={bodyRef}>
                 <div className="git-graph-body-main">
@@ -1566,6 +1574,7 @@ function GitHistoryView({
                         onCopyMessages={() => handleMultiSelectAction('copySelectedMessages')}
                         onCherryPick={() => handleMultiSelectAction('cherryPickSelected')}
                         onRevert={() => handleMultiSelectAction('revertSelected')}
+                        onExportDevLog={() => setDevLogModal({ open: true, template: 'timeline', useSelection: true })}
                         onClear={() => {
                             clearSelection();
                             setDetailAnchor(null);
@@ -1683,6 +1692,19 @@ function GitHistoryView({
                     onFileContextMenu={handleFileContextMenu}
                 />
             )}
+            <DevLogExportDialog
+                open={devLogModal.open}
+                initialTemplate={devLogModal.template}
+                initialUseSelection={devLogModal.useSelection}
+                repo={repo}
+                repoName={repoDisplayName(repo)}
+                branchLabel={selectedBranch ?? branchHead ?? $t('git.devLog.allBranches')}
+                commitHead={commitHead}
+                commits={commits}
+                selectedCommits={sortCommitsByListOrder(commits, selectedIndices)}
+                graphConfig={graphConfig}
+                onClose={() => setDevLogModal((prev) => ({ ...prev, open: false }))}
+            />
             <ContextMenu
                 menu={menu}
                 onClose={closeMenu}

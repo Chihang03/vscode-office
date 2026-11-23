@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { CommitService } from '../service/commitService';
+import { DevLogExportService } from '../service/devLogExportService';
 import { GitActions } from '../service/gitActions';
 import { findGit } from '../service/findGit';
 import { GitExecutor } from '../service/gitExecutor';
@@ -22,6 +23,7 @@ let repoDiscovery: RepoDiscovery | undefined;
 let gitActions: GitActions | undefined;
 let gitRepoCommands: GitRepoCommands | undefined;
 let gitActionHandler: GitActionHandler | undefined;
+let devLogExportService: DevLogExportService | undefined;
 
 interface GitRepository {
     rootUri: vscode.Uri;
@@ -84,7 +86,7 @@ async function openGitHistory(
     context: vscode.ExtensionContext,
     panelContext: GitHistoryPanelContext = {},
 ): Promise<void> {
-    if (!commitService || !repoDiscovery || !gitActions || !gitRepoCommands || !gitActionHandler) {
+    if (!commitService || !repoDiscovery || !gitActions || !gitRepoCommands || !gitActionHandler || !devLogExportService) {
         return;
     }
     await repoDiscovery.discover();
@@ -102,6 +104,7 @@ async function openGitHistory(
         repoDiscovery,
         gitActions,
         gitActionHandler,
+        devLogExportService,
         panelContext,
     );
     TelemetryService.get()?.trackViewOpen('gitHistory');
@@ -179,6 +182,7 @@ export async function activateGitHistory(context: vscode.ExtensionContext): Prom
         gitActions = new GitActions(executor);
         gitRepoCommands = new GitRepoCommands(executor);
         gitActionHandler = new GitActionHandler(gitRepoCommands);
+        devLogExportService = new DevLogExportService(executor);
         repoDiscovery.bindToContext(context);
         await repoDiscovery.discover();
     } catch {
@@ -219,7 +223,7 @@ export async function activateGitHistory(context: vscode.ExtensionContext): Prom
         }),
         vscode.window.registerWebviewPanelSerializer(
             GIT_HISTORY_VIEW_TYPE,
-            new GitHistoryPanelSerializer(context, commitService, repoDiscovery, gitActions, gitActionHandler)
+            new GitHistoryPanelSerializer(context, commitService, repoDiscovery, gitActions, gitActionHandler, devLogExportService)
         )
     );
 }

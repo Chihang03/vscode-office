@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { PanelHandler } from './panelHandler';
 import type { CommitService } from '../service/commitService';
+import type { DevLogExportService, ExportDevLogPayload } from '../service/devLogExportService';
 import type { GitActions } from '../service/gitActions';
 import { RepoFileWatcher } from '../service/repoFileWatcher';
 import type { RepoDiscovery } from '../service/repoDiscovery';
@@ -40,6 +41,7 @@ export class MessageRouter {
         private readonly panelContext: GitHistoryPanelContext,
         private readonly gitActionHandler: GitActionHandler,
         private readonly extensionContext: vscode.ExtensionContext,
+        private readonly devLogExportService: DevLogExportService,
     ) {
         this.repoFileWatcher = new RepoFileWatcher(() => this.onRepoFileChanged());
     }
@@ -112,6 +114,31 @@ export class MessageRouter {
                     false,
                 );
                 void vscode.commands.executeCommand('workbench.action.editorLayoutSingle');
+            }))
+            .on('loadDevLogStats', this.wrapHandler(async (content) => {
+                const payload = content as { repo: string; hashes: string[]; requestId: number };
+                try {
+                    const stats = await this.devLogExportService.loadCommitStats(payload.repo, payload.hashes);
+                    this.handler.emit('devLogStatsResult', {
+                        requestId: payload.requestId,
+                        stats,
+                        error: null,
+                    });
+                } catch (e) {
+                    this.handler.emit('devLogStatsResult', {
+                        requestId: payload.requestId,
+                        stats: {},
+                        error: e instanceof Error ? e.message : String(e),
+                    });
+                }
+            }))
+            .on('exportDevLog', this.wrapHandler(async (content) => {
+                const payload = content as ExportDevLogPayload & { requestId: number };
+                const result = await this.devLogExportService.exportDevLog(payload);
+                this.handler.emit('exportDevLogResult', {
+                    requestId: payload.requestId,
+                    ...result,
+                });
             }));
     }
 

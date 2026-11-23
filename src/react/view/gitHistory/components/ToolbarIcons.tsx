@@ -64,6 +64,10 @@ export function ExpandLayoutIcon(props: Omit<CodiconButtonProps, 'icon' | 'varia
     return <CodiconButton icon="expand-all" {...props} />;
 }
 
+export function ExportIcon(props: Omit<CodiconButtonProps, 'icon' | 'variant'>) {
+    return <CodiconButton icon="export" {...props} />;
+}
+
 export function ThemeToggleIcon({
     adaptive,
     onClick,

@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { ReactApp } from '../../common/reactApp';
 import { getExtensionResourceRoots } from '../../common/extensionResource';
 import type { CommitService } from '../service/commitService';
+import type { DevLogExportService } from '../service/devLogExportService';
 import type { GitActions } from '../service/gitActions';
 import type { RepoDiscovery } from '../service/repoDiscovery';
 import { getPanelKey, type GitHistoryPanelContext, type GitHistoryPanelSerializedState } from './gitHistoryPanelContext';
@@ -101,6 +102,7 @@ export class GitHistoryPanel {
         repoDiscovery: RepoDiscovery,
         gitActions: GitActions,
         gitActionHandler: GitActionHandler,
+        devLogExportService: DevLogExportService,
         panelContext: GitHistoryPanelContext = {}
     ): Promise<void> {
         const key = getPanelKey(panelContext.fileUri);
@@ -142,7 +144,7 @@ export class GitHistoryPanel {
 
         await applyFileHistorySplitLayout(panelContext, layout);
 
-        await GitHistoryPanel.attach(context, panel, commitService, repoDiscovery, gitActions, gitActionHandler, panelContext);
+        await GitHistoryPanel.attach(context, panel, commitService, repoDiscovery, gitActions, gitActionHandler, devLogExportService, panelContext);
     }
 
     private static getLocalResourceRoots(context: vscode.ExtensionContext): vscode.Uri[] {
@@ -156,6 +158,7 @@ export class GitHistoryPanel {
         repoDiscovery: RepoDiscovery,
         gitActions: GitActions,
         gitActionHandler: GitActionHandler,
+        devLogExportService: DevLogExportService,
         panelContext: GitHistoryPanelContext = {}
     ): Promise<void> {
         const key = getPanelKey(panelContext.fileUri);
@@ -163,7 +166,7 @@ export class GitHistoryPanel {
         if (existing && existing.panel !== panel) {
             existing.panel.dispose();
         }
-        await GitHistoryPanel.attach(context, panel, commitService, repoDiscovery, gitActions, gitActionHandler, panelContext);
+        await GitHistoryPanel.attach(context, panel, commitService, repoDiscovery, gitActions, gitActionHandler, devLogExportService, panelContext);
     }
 
     private static applyPanelIcon(panel: vscode.WebviewPanel, context: vscode.ExtensionContext): void {
@@ -180,6 +183,7 @@ export class GitHistoryPanel {
         repoDiscovery: RepoDiscovery,
         gitActions: GitActions,
         gitActionHandler: GitActionHandler,
+        devLogExportService: DevLogExportService,
         panelContext: GitHistoryPanelContext
     ): Promise<void> {
         GitHistoryPanel.applyPanelIcon(panel, context);
@@ -200,6 +204,7 @@ export class GitHistoryPanel {
             panelContext,
             gitActionHandler,
             context,
+            devLogExportService,
         );
         router.bind();
 
