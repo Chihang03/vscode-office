@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Empty, Spin, Typography } from 'antd';
 import type { MouseEvent } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitCommit, GitCommitDetails, GitFileChange } from '../types';
 import { fileTouchesPath } from '../util/repoPath';
 import {
@@ -165,33 +166,33 @@ function CommitInfoPanel({
     return (
         <div className="git-graph-cdv-detail-panel">
             <div className="git-graph-cdv-detail-message git-graph-cdv-detail-message-top">
-                <div className="git-graph-cdv-detail-label">Message</div>
+                <div className="git-graph-cdv-detail-label">{$t('git.message')}</div>
                 <div className="git-graph-cdv-detail-subject">{commit.message}</div>
             </div>
             <div className="git-graph-cdv-detail-grid">
-                <div className="git-graph-cdv-detail-label">Commit</div>
+                <div className="git-graph-cdv-detail-label">{$t('git.commitLabel')}</div>
                 <code
                     className="git-graph-cdv-detail-value git-graph-cdv-detail-hash"
                     title={details.hash}
                 >
                     {abbrevHash(details.hash)}
                 </code>
-                <div className="git-graph-cdv-detail-label">Date</div>
+                <div className="git-graph-cdv-detail-label">{$t('git.date')}</div>
                 <div className="git-graph-cdv-detail-value">{formatLongDate(details.committerDate)}</div>
-                <div className="git-graph-cdv-detail-label">Files</div>
+                <div className="git-graph-cdv-detail-label">{$t('git.filesLabel')}</div>
                 <div className="git-graph-cdv-detail-value">
-                    {fileChanges.length} changed
+                    {$t('git.filesChanged', { count: fileChanges.length })}
                     <span className="git-graph-status-added"> +{additions}</span>
                     <span className="git-graph-status-deleted"> -{deletions}</span>
                 </div>
-                <div className="git-graph-cdv-detail-label">Author</div>
+                <div className="git-graph-cdv-detail-label">{$t('git.author')}</div>
                 <div className="git-graph-cdv-detail-value">
                     <PersonValue name={details.author} email={details.authorEmail} />
                 </div>
             </div>
             {body && (
                 <div className="git-graph-cdv-detail-message git-graph-cdv-detail-body-section">
-                    <div className="git-graph-cdv-detail-label">Details</div>
+                    <div className="git-graph-cdv-detail-label">{$t('git.detailsLabel')}</div>
                     <div className="git-graph-cdv-detail-body"><LinkifiedCommitBody text={body} /></div>
                 </div>
             )}
@@ -266,13 +267,13 @@ export default function CommitDetailPopup({
         body = (
             <div className="git-graph-cdv-loading">
                 <Spin size="small" />
-                <span>Loading commit details...</span>
+                <span>{$t('git.loadingCommitDetails')}</span>
             </div>
         );
     } else if (error) {
         body = <Text className="git-graph-status-deleted">{error}</Text>;
     } else if (!details) {
-        body = <Empty description="No commit details" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+        body = <Empty description={$t('git.noCommitDetails')} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     } else if (detailViewMode === 'commit') {
         body = (
             <CommitInfoPanel
@@ -301,7 +302,7 @@ export default function CommitDetailPopup({
                 <div className="git-graph-cdv-files">
                     {relPath && filterCurrentFile && fileChanges.length === 0 ? (
                         <Empty
-                            description="This file was not changed in the selected commit"
+                            description={$t('git.fileNotChangedInCommit')}
                             image={Empty.PRESENTED_IMAGE_SIMPLE}
                         />
                     ) : (
@@ -338,15 +339,15 @@ export default function CommitDetailPopup({
                 <div className="git-graph-cdv-content">{body}</div>
             </div>
             <div className="git-graph-cdv-controls">
-                <button type="button" className="git-graph-icon-btn" title="Close (Escape)" onClick={onClose}>
+                <button type="button" className="git-graph-icon-btn" title={$t('git.closeEsc')} onClick={onClose}>
                     <span className="codicon codicon-close" aria-hidden />
                 </button>
                 <button
                     type="button"
                     className="git-graph-icon-btn"
                     title={detailViewMode === 'commit'
-                        ? 'Show changed files'
-                        : fileViewMode === 'tree' ? 'Show files as list' : 'Show files as tree'}
+                        ? $t('git.showChangedFiles')
+                        : fileViewMode === 'tree' ? $t('git.showFilesAsList') : $t('git.showFilesAsTree')}
                     onClick={() => {
                         if (detailViewMode === 'commit') {
                             setDetailViewMode('files');
@@ -363,7 +364,7 @@ export default function CommitDetailPopup({
                 <button
                     type="button"
                     className={`git-graph-icon-btn${detailViewMode === 'commit' ? ' active' : ''}`}
-                    title={detailViewMode === 'commit' ? 'Show changed files' : 'Show commit details'}
+                    title={detailViewMode === 'commit' ? $t('git.showChangedFiles') : $t('git.showCommitDetails')}
                     onClick={() => setDetailViewMode((mode) => (mode === 'commit' ? 'files' : 'commit'))}
                 >
                     <span className="codicon codicon-git-commit" aria-hidden />
@@ -372,7 +373,7 @@ export default function CommitDetailPopup({
                     <button
                         type="button"
                         className={`git-graph-icon-btn${filterCurrentFile ? ' active' : ''}`}
-                        title="Show only changes to the current file"
+                        title={$t('git.filterCurrentFileTooltip')}
                         onClick={onToggleFilterCurrentFile}
                     >
                         <span className="codicon codicon-file" aria-hidden />

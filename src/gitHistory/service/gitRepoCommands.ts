@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { i18n } from '@/common/global';
 import type { GitFileStatus } from '../types/git';
 import { UNCOMMITTED } from '../types/git';
 import type { GitExecutor } from './gitExecutor';
@@ -239,7 +240,7 @@ export class GitRepoCommands {
             : toGitUri(repo, newFilePath, toHash);
 
         const fileName = path.basename(newFilePath);
-        const title = `${fileName} (${abbrevHash(leftHash)} ↔ ${toHash === UNCOMMITTED ? 'Working Tree' : abbrevHash(toHash)})`;
+        const title = `${fileName} (${abbrevHash(leftHash)} ↔ ${toHash === UNCOMMITTED ? i18n('ext.git.workingTree') : abbrevHash(toHash)})`;
 
         try {
             if (type === 'D') {

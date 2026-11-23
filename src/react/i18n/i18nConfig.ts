@@ -65,6 +65,10 @@ export function initI18n(language?: string): void {
     currentLocale = resolveLocale(language);
 }
 
+export function getCurrentLocale(): string {
+    return currentLocale;
+}
+
 export function $t(key: string, vars?: Record<string, string | number>): string {
     let message = lookup(messages[currentLocale], key)
         ?? lookup(messages.en, key)

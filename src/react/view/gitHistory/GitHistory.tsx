@@ -82,7 +82,7 @@ function GitHistoryBottomBar({ commitCount = 0 }: { commitCount?: number }) {
         <footer className={`git-graph-bottom-bar${commitCount > 0 ? ' has-more' : ''}`}>
             {commitCount > 0 && (
                 <span className="git-graph-more">
-                    Showing {commitCount} commits
+                    {$t('git.showingCommits', { count: commitCount })}
                 </span>
             )}
             <div className="git-graph-bottom-bar-sponsor">
@@ -1005,9 +1005,9 @@ function GitHistoryView({
         setToolbarPrompt({
             kind: 'pick',
             id: 'remote',
-            title: 'Pull Branch',
-            message: `Pull "${branchHead}" from remote`,
-            submitLabel: 'Pull',
+            title: $t('git.pullBranch'),
+            message: $t('git.pullBranchFromRemote', { branch: branchHead }),
+            submitLabel: $t('git.pull'),
             options: remotes.map((remote) => ({ value: remote, label: remote })),
         });
     };
@@ -1029,15 +1029,15 @@ function GitHistoryView({
         setToolbarPrompt({
             kind: 'form',
             id: 'pushBranch',
-            title: 'Push Branch',
+            title: $t('git.pushBranch'),
             variant: 'pushBranch' as any,
             message: remotes.length > 1
-                ? `Push "${branchHead}" to remote`
-                : `Push "${branchHead}" to ${remotes[0]}`,
-            submitLabel: 'Push',
+                ? $t('git.pushBranchToRemote', { branch: branchHead })
+                : $t('git.pushBranchTo', { branch: branchHead, remote: remotes[0] }),
+            submitLabel: $t('git.push'),
             fields: [
                 ...remoteFields,
-                { type: 'checkbox', id: 'force', label: 'Force Push', defaultValue: false },
+                { type: 'checkbox', id: 'force', label: $t('git.forcePush'), defaultValue: false },
             ],
         });
     };
@@ -1050,7 +1050,7 @@ function GitHistoryView({
             setToolbarPrompt(null);
             setToolbarPromptKind(null);
             setToolbarPromptAnchor(null);
-            setError(`No remote URL found for ${repoDisplayName(targetRepo)}.`);
+            setError($t('git.noRemoteUrlForRepo', { repo: repoDisplayName(targetRepo) }));
             return;
         }
         if (urls.length > 1) {
@@ -1058,10 +1058,10 @@ function GitHistoryView({
             setToolbarPrompt({
                 kind: 'pick',
                 id: 'url',
-                title: 'Open Remote',
-                message: 'Select remote repository',
+                title: $t('git.openRemote'),
+                message: $t('git.selectRemote'),
                 variant: 'openRemote',
-                submitLabel: 'Open',
+                submitLabel: $t('git.open'),
                 options: urls.map((remote) => ({
                     value: remote.url,
                     label: remote.name,
@@ -1086,10 +1086,10 @@ function GitHistoryView({
             setToolbarPrompt({
                 kind: 'pick',
                 id: 'repo',
-                title: 'Open Remote',
-                message: 'Select repository',
+                title: $t('git.openRemote'),
+                message: $t('git.selectRepo'),
                 variant: 'openRemote',
-                submitLabel: 'Open',
+                submitLabel: $t('git.open'),
                 options: [...repos].sort((a, b) => {
                     if (a === repo) return -1;
                     if (b === repo) return 1;
@@ -1477,7 +1477,7 @@ function GitHistoryView({
             {filePath && (
                 <div className="git-graph-file-banner" title={relPath ?? filePath}>
                     <span className="codicon codicon-file" aria-hidden />
-                    <span className="git-graph-file-banner-label">File History:</span>
+                    <span className="git-graph-file-banner-label">{$t('git.fileHistoryLabel')}</span>
                     <span className="git-graph-file-banner-path">{relPath ?? fileName ?? filePath}</span>
                 </div>
             )}
@@ -1629,9 +1629,9 @@ function GitHistoryView({
                     step={{
                         kind: 'confirm',
                         id: 'confirm',
-                        title: 'Delete Remote',
-                        message: `Delete remote "${remoteDeleteName}"?`,
-                        confirmLabel: 'Delete',
+                        title: $t('git.deleteRemote'),
+                        message: $t('git.deleteRemoteConfirm', { name: remoteDeleteName }),
+                        confirmLabel: $t('common.delete'),
                         danger: true,
                     }}
                     onCancel={() => setRemoteDeleteName(null)}
@@ -1644,9 +1644,9 @@ function GitHistoryView({
                     step={{
                         kind: 'confirm',
                         id: 'confirm',
-                        title: batchConfirm.kind === 'cherryPick' ? 'Cherry Pick Commits' : 'Revert Commits',
+                        title: batchConfirm.kind === 'cherryPick' ? $t('git.cherryPickCommits') : $t('git.revertCommits'),
                         message: buildBatchActionMessage(batchConfirm.commits, batchConfirm.kind),
-                        confirmLabel: batchConfirm.kind === 'cherryPick' ? 'Cherry Pick' : 'Revert',
+                        confirmLabel: batchConfirm.kind === 'cherryPick' ? $t('git.cherryPick') : $t('git.revert'),
                         danger: batchConfirm.kind === 'revert',
                     }}
                     onCancel={() => setBatchConfirm(null)}

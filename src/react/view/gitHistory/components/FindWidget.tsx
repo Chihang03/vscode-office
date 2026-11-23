@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitCommit } from '../types';
 import { findCommitMatches } from '../util/findCommits';
 
@@ -62,10 +63,10 @@ export default function FindWidget({
 
     const noResults = !regexError && text.trim() !== '' && matches.indices.length === 0;
     const positionLabel = regexError
-        ? 'Invalid regex'
+        ? $t('git.invalidRegex')
         : matches.indices.length > 0 && activePosition >= 0
-            ? `${activePosition + 1} of ${matches.indices.length}`
-            : 'No Results';
+            ? $t('git.findPosition', { current: activePosition + 1, total: matches.indices.length })
+            : $t('git.noResults');
 
     return (
         <div className={`git-graph-find-widget${regexError ? ' error' : ''}`} role="search">
@@ -73,7 +74,7 @@ export default function FindWidget({
                 <input
                     type="text"
                     className="vscode-input git-graph-find-input"
-                    placeholder="Find"
+                    placeholder={$t('git.find')}
                     value={text}
                     autoFocus
                     onChange={(e) => {
@@ -95,7 +96,7 @@ export default function FindWidget({
                     <button
                         type="button"
                         className={`git-graph-find-modifier${caseSensitive ? ' active' : ''}`}
-                        title="Match Case"
+                        title={$t('git.matchCase')}
                         onClick={() => {
                             const next = !caseSensitive;
                             setCaseSensitive(next);
@@ -107,7 +108,7 @@ export default function FindWidget({
                     <button
                         type="button"
                         className={`git-graph-find-modifier${useRegex ? ' active' : ''}`}
-                        title="Use Regular Expression"
+                        title={$t('git.useRegex')}
                         onClick={() => {
                             const next = !useRegex;
                             setUseRegex(next);
@@ -122,7 +123,7 @@ export default function FindWidget({
             <button
                 type="button"
                 className="git-graph-icon-btn"
-                title="Previous match (Shift+Enter)"
+                title={$t('git.prevMatch')}
                 disabled={matches.indices.length === 0}
                 onClick={() => go(-1)}
             >
@@ -131,13 +132,13 @@ export default function FindWidget({
             <button
                 type="button"
                 className="git-graph-icon-btn"
-                title="Next match (Enter)"
+                title={$t('git.nextMatch')}
                 disabled={matches.indices.length === 0}
                 onClick={() => go(1)}
             >
                 <span className="codicon codicon-arrow-down" aria-hidden />
             </button>
-            <button type="button" className="git-graph-icon-btn" title="Close (Escape)" onClick={onClose}>
+            <button type="button" className="git-graph-icon-btn" title={$t('git.closeEsc')} onClick={onClose}>
                 <span className="codicon codicon-close" aria-hidden />
             </button>
         </div>

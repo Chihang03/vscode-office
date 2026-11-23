@@ -14,6 +14,7 @@ import type {
     LoadRepositoryRequest,
     LoadRepositoryResult,
 } from '../types/git';
+import { i18n } from '@/common/global';
 import { UNCOMMITTED } from '../types/git';
 import type { GitExecutor } from './gitExecutor';
 import {
@@ -306,7 +307,7 @@ export class CommitService {
                     author: '*',
                     email: '',
                     date: Math.round(Date.now() / 1000),
-                    message: `Uncommitted Changes (${numUncommitted})`,
+                    message: i18n('ext.git.uncommittedChanges', String(numUncommitted)),
                     heads: [],
                     tags: [],
                     remotes: [],

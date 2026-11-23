@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import iconv from 'iconv-lite';
+import { i18n } from '@/common/global';
 import type { GitExecutable } from '../types/git';
 
 export const UNABLE_TO_FIND_GIT_MSG =
@@ -71,7 +72,7 @@ function getErrorMessage(error: Error | null, stdout: Buffer, stderr: Buffer): s
     if (priorityLine) return priorityLine;
     if (stderrLines.length > 0) return stderrLines[0];
     if (stdoutLines.length > 0) return stdoutLines[stdoutLines.length - 1];
-    return 'Git command failed';
+    return i18n('ext.git.commandFailed');
 }
 
 function getWarningMessage(stderr: Buffer): string | null {

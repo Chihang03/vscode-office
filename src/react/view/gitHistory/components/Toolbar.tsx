@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 import VscodeDropdown from './VscodeDropdown';
 import { FetchIcon, PullIcon, PushIcon, RefreshIcon, RemoteIcon, FindIcon, SettingsIcon, ThemeToggleIcon, ExpandLayoutIcon } from './ToolbarIcons';
 
@@ -65,7 +66,7 @@ export default function Toolbar({
                 <input
                     type="text"
                     className="vscode-input"
-                    placeholder="Enter to search commit"
+                    placeholder={$t('git.searchPlaceholder')}
                     value={searchValue}
                     onChange={(e) => onSearchChange(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') onSearch(); }}
@@ -75,61 +76,61 @@ export default function Toolbar({
             <div className="git-graph-toolbar-filters">
                 {showRepo && (
                     <VscodeDropdown
-                        label="Repo:"
+                        label={$t('git.repoLabel')}
                         options={repos.map((r) => ({ value: r, label: repoLabel(r), hint: r }))}
                         value={repo}
-                        filterPlaceholder="Filter repositories..."
+                        filterPlaceholder={$t('git.filterRepos')}
                         showAllOption={false}
                         onChange={(v) => { if (typeof v === 'string' && v) onRepoChange(v); }}
                     />
                 )}
                 <VscodeDropdown
-                    label="Branch:"
+                    label={$t('git.branchLabel')}
                     options={branches.map((b) => ({ value: b, label: b }))}
                     value={selectedBranch ?? ''}
-                    allLabel="All"
-                    filterPlaceholder="Filter branches..."
+                    allLabel={$t('git.all')}
+                    filterPlaceholder={$t('git.filterBranches')}
                     onChange={(v) => onBranchChange(typeof v === 'string' && v ? v : null)}
                 />
                 <VscodeDropdown
-                    label="Author"
+                    label={$t('git.authorLabel')}
                     variant="toolbar"
-                    triggerLabel={selectedAuthor ? undefined : 'Author'}
+                    triggerLabel={selectedAuthor ? undefined : $t('git.authorLabel')}
                     options={authors.map((a) => ({ value: a, label: a }))}
                     value={selectedAuthor ?? ''}
-                    allLabel="All"
-                    filterPlaceholder="Filter authors..."
+                    allLabel={$t('git.all')}
+                    filterPlaceholder={$t('git.filterAuthors')}
                     onChange={(v) => onAuthorChange(typeof v === 'string' && v ? v : undefined)}
                 />
             </div>
 
             <div className="git-graph-toolbar-actions">
                 <RefreshIcon
-                    title="Refresh"
+                    title={$t('git.refresh')}
                     onClick={onRefresh}
                     disabled={refreshing}
                     className={refreshing ? ' spinning' : ''}
                 />
                 <FetchIcon
-                    title="Fetch from remote(s)"
+                    title={$t('git.fetchTooltip')}
                     onClick={onFetch}
                     disabled={fetching || pushing || pulling || !repo}
                     className={fetching ? 'running' : undefined}
                 />
                 <PullIcon
-                    title="Pull current branch from remote"
+                    title={$t('git.pullTooltip')}
                     onClick={onPull}
                     disabled={pulling || pushing || fetching || !canPull}
                     className={pulling ? 'running' : undefined}
                 />
                 <PushIcon
-                    title="Push current branch to remote"
+                    title={$t('git.pushTooltip')}
                     onClick={onPush}
                     disabled={pushing || fetching || pulling || !canPush}
                     className={pushing ? 'running' : undefined}
                 />
                 <RemoteIcon
-                    title={hasRemoteUrl ? 'Open remote repository' : 'No remote URL configured'}
+                    title={hasRemoteUrl ? $t('git.openRemoteTooltip') : $t('git.noRemoteUrlTooltip')}
                     onClick={onOpenRemote}
                     disabled={!repo || !hasRemoteUrl}
                 />
@@ -138,19 +139,19 @@ export default function Toolbar({
             <div className="git-graph-toolbar-tools">
                 {splitView && (
                     <ExpandLayoutIcon
-                        title="Expand to single editor layout"
+                        title={$t('git.expandLayoutTooltip')}
                         onClick={onExpandLayout}
                     />
                 )}
                 <ThemeToggleIcon adaptive={adaptiveColorMode} onClick={onToggleColorMode} />
                 <FindIcon
-                    title="Find in commit history (Ctrl+F)"
+                    title={$t('git.findTooltip')}
                     onClick={onToggleFind}
                     className={findActive ? 'active' : undefined}
                     disabled={!repo}
                 />
                 <SettingsIcon
-                    title="Repository settings"
+                    title={$t('git.repoSettingsTooltip')}
                     onClick={onToggleSettings}
                     className={settingsActive ? 'active' : undefined}
                     disabled={!repo}

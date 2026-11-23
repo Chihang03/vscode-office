@@ -2,7 +2,7 @@
 	"name": "kieran-document-studio",
 	"displayName": "Kieran Document Studio（文档工作台）",
 	"description": "Kieran Dai 独立维护的社区 fork：在 VS Code 中查看办公文档、编辑 Markdown，并浏览 Git 历史。",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"publisher": "chihang03",
 	"icon": "image/kieran-document-studio.png",
 	"engines": {
@@ -244,21 +244,21 @@
 			},
 			{
 				"command": "kieranDocumentStudio.gitHistory.view",
-				"title": "View Git History",
+				"title": "%command.gitHistory.view%",
 				"icon": "$(history)",
 				"enablement": "!kieranDocumentStudio.extensionHost.web",
 				"category": "Kieran Document Studio"
 			},
 			{
 				"command": "kieranDocumentStudio.gitHistory.viewFileHistory",
-				"title": "Git: View File History",
+				"title": "%command.gitHistory.viewFileHistory%",
 				"icon": "$(git-commit)",
 				"enablement": "!kieranDocumentStudio.extensionHost.web",
 				"category": "Kieran Document Studio"
 			},
 			{
 				"command": "kieranDocumentStudio.gitHistory.quickSync",
-				"title": "Git: Quick Sync",
+				"title": "%command.gitHistory.quickSync%",
 				"icon": "$(sync)",
 				"enablement": "!kieranDocumentStudio.extensionHost.web",
 				"category": "Kieran Document Studio"
@@ -675,13 +675,13 @@
 		],
 		"configuration": [
 			{
-				"title": "Git History",
+				"title": "%config.gitHistory.title%",
 				"order": 98,
 				"properties": {
 					"kieran-document-studio.gitHistory.quickSyncButton": {
 						"type": "boolean",
 						"default": false,
-						"description": "Show Quick Sync button in Source Control (Git) title toolbar."
+						"description": "%config.gitHistory.quickSyncButton.description%"
 					}
 				}
 			},

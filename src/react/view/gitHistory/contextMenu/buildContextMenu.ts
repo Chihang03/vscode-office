@@ -56,9 +56,9 @@ export function buildCommitContextMenu(commit: GitCommit, ctx: MenuContext): Con
             { id: 'addTag', label: $t('git.addTag') },
         ]),
         ...sep([
-            { id: 'checkout', label: 'Checkout' },
-            { id: 'cherryPick', label: 'Cherry Pick' },
-            { id: 'revert', label: 'Revert' },
+            { id: 'checkout', label: $t('git.checkout') },
+            { id: 'cherryPick', label: $t('git.cherryPick') },
+            { id: 'revert', label: $t('git.revert') },
         ]),
         ...sep([
             { id: 'merge', ...formatMergeMenuLabel(abbrevHash(hash)) },
@@ -78,8 +78,8 @@ export function buildMultiCommitContextMenu(count: number): ContextMenuItem[] {
     return [
         { id: 'copySelectedHashes', label: `${$t('git.copyCommitHash')}${suffix}` },
         { id: 'copySelectedMessages', label: `${$t('git.copyCommitMessage')}${suffix}` },
-        { id: 'cherryPickSelected', label: `Cherry Pick${suffix}`, separatorBefore: true },
-        { id: 'revertSelected', label: `Revert${suffix}` },
+        { id: 'cherryPickSelected', label: `${$t('git.cherryPick')}${suffix}`, separatorBefore: true },
+        { id: 'revertSelected', label: `${$t('git.revert')}${suffix}` },
     ];
 }
 

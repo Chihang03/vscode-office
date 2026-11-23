@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
+import { $t } from '../../../i18n/i18nConfig';
 import ToolbarTooltip from './ToolbarTooltip';
 
 interface CodiconButtonProps {
@@ -70,7 +71,7 @@ export function ThemeToggleIcon({
     adaptive: boolean;
     onClick: () => void;
 }) {
-    const label = adaptive ? '切换亮色' : '切换暗色（跟随 VS Code 主题）';
+    const label = adaptive ? $t('common.switchToLight') : $t('common.switchToDark');
     return (
         <ToolbarTooltip content={label}>
             <button

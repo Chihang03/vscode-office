@@ -74,7 +74,7 @@ export function getPromptSteps(
                 commitHash: payload.hash as string,
                 submitLabel: $t('git.createBranch'),
                 fields: [
-                    { type: 'text', id: 'branchName', label: $t('git.branchName'), placeholder: 'branch-name' },
+                    { type: 'text', id: 'branchName', label: $t('git.branchName'), placeholder: $t('git.branchNamePlaceholder') },
                     { type: 'checkbox', id: 'checkout', label: $t('git.checkOut'), defaultValue: false },
                 ],
             }];
@@ -209,10 +209,10 @@ export function getPromptSteps(
             return [{
                 kind: 'form',
                 id: 'cherryPick',
-                title: 'Cherry Pick',
+                title: $t('git.cherryPick'),
                 variant: 'cherryPick',
                 commitHash: payload.hash as string,
-                submitLabel: 'Cherry pick',
+                submitLabel: $t('git.cherryPick'),
                 fields,
             }];
         }
@@ -220,11 +220,11 @@ export function getPromptSteps(
             return [{
                 kind: 'confirm',
                 id: 'confirm',
-                title: 'Revert',
+                title: $t('git.revert'),
                 message: '',
                 variant: 'revertCommit',
                 commitHash: payload.hash as string,
-                confirmLabel: 'Revert',
+                confirmLabel: $t('git.revert'),
             }];
         case 'resetToCommit': {
             const branchName = ctx.branchHead && !ctx.branchHead.startsWith('(HEAD detached')
@@ -335,7 +335,7 @@ export function getPromptSteps(
                 id: 'branchName',
                 title: $t('git.createBranchFromStash'),
                 label: $t('git.branchName'),
-                placeholder: 'branch-name',
+                placeholder: $t('git.branchNamePlaceholder'),
             }];
         case 'pushStash':
             return [{
@@ -343,7 +343,7 @@ export function getPromptSteps(
                 id: 'message',
                 title: $t('git.stashChanges'),
                 label: $t('git.stashMessage'),
-                placeholder: 'WIP',
+                placeholder: $t('git.stashMessagePlaceholder'),
                 optional: true,
             }];
         case 'resetUncommitted':

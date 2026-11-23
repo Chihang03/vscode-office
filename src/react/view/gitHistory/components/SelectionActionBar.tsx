@@ -22,8 +22,8 @@ export default function SelectionActionBar({
     }
 
     return (
-        <div className="git-graph-selection-bar" role="toolbar" aria-label="Batch commit actions">
-            <span className="git-graph-selection-bar-count">{count} commits selected</span>
+        <div className="git-graph-selection-bar" role="toolbar" aria-label={$t('git.batchCommitActions')}>
+            <span className="git-graph-selection-bar-count">{$t('git.commitsSelected', { count })}</span>
             <div className="git-graph-selection-bar-actions">
                 <button type="button" className="git-graph-selection-bar-btn" onClick={onCopyHashes}>
                     <span className="codicon codicon-git-commit" aria-hidden />
@@ -35,14 +35,14 @@ export default function SelectionActionBar({
                 </button>
                 <button type="button" className="git-graph-selection-bar-btn" onClick={onCherryPick}>
                     <span className="codicon codicon-git-compare" aria-hidden />
-                    Cherry Pick
+                    {$t('git.cherryPick')}
                 </button>
                 <button type="button" className="git-graph-selection-bar-btn git-graph-selection-bar-btn-danger" onClick={onRevert}>
                     <span className="codicon codicon-discard" aria-hidden />
-                    Revert
+                    {$t('git.revert')}
                 </button>
                 <button type="button" className="git-graph-selection-bar-btn git-graph-selection-bar-btn-ghost" onClick={onClear}>
-                    Clear
+                    {$t('git.clear')}
                 </button>
             </div>
         </div>

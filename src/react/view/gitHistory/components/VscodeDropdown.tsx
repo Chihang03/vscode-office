@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 
 export interface DropdownOption {
     value: string;
@@ -33,7 +34,7 @@ export default function VscodeDropdown({
     options,
     value,
     multiple = false,
-    allLabel = 'All',
+    allLabel = $t('git.all'),
     filterPlaceholder,
     showAllOption = true,
     variant = 'default',
@@ -58,7 +59,7 @@ export default function VscodeDropdown({
             if (selected.length === 1) {
                 return options.find((o) => o.value === selected[0])?.label ?? selected[0];
             }
-            return `${selected.length} selected`;
+            return $t('git.selectedCount', { count: selected.length });
         }
         const v = typeof value === 'string' ? value : '';
         if (!v) return allLabel;
@@ -163,7 +164,7 @@ export default function VscodeDropdown({
                                 {allLabel}
                             </button>
                             <button type="button" className="vscode-dropdown-action" onClick={clearAll}>
-                                Clear
+                                {$t('git.clear')}
                             </button>
                         </div>
                     )}
@@ -198,7 +199,7 @@ export default function VscodeDropdown({
                             </button>
                         ))}
                         {filteredOptions.length === 0 && (
-                            <div className="vscode-dropdown-empty">No results</div>
+                            <div className="vscode-dropdown-empty">{$t('git.noResults')}</div>
                         )}
                     </div>
                     </div>

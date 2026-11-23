@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Spin } from 'antd';
+import { $t } from '../../../i18n/i18nConfig';
 import type { AnchoredDialogPositionVariant, PopupAnchor } from '../util/commitDetailPopup';
 import { useAnchoredDialogPosition } from '../hooks/useAnchoredDialogPosition';
 
@@ -57,7 +58,7 @@ export function AnchoredDialogActions({
     primaryDanger = false,
     isLoading = false,
     onCancel,
-    cancelLabel = 'Cancel',
+    cancelLabel = $t('common.cancel'),
 }: AnchoredDialogActionsProps) {
     return (
         <div className="git-graph-anchored-dialog-actions">

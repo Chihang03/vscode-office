@@ -1,3 +1,4 @@
+import { i18n } from '@/common/global';
 import type { GitActionPayload, GitActionResult } from '../types/gitActions';
 import { GitRepoCommands, type GitCommandResult } from '../service/gitRepoCommands';
 
@@ -179,7 +180,7 @@ export class GitActionHandler {
             case 'copyFilePath':
                 return this.commands.copyFilePath(payload.repo, payload.filePath, payload.absolute);
             default:
-                return { error: 'Unknown action', warning: null };
+                return { error: i18n('ext.git.unknownAction'), warning: null };
         }
     }
 }

@@ -1,3 +1,4 @@
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitCommit } from '../types';
 import { UNCOMMITTED } from '../graph/layoutEngine';
 
@@ -124,8 +125,8 @@ export function buildBatchActionMessage(
     action: 'cherryPick' | 'revert',
 ): string {
     const orderNote = action === 'cherryPick'
-        ? 'Commits will be cherry-picked from oldest to newest.'
-        : 'Commits will be reverted from newest to oldest.';
+        ? $t('git.batchCherryPickOrder')
+        : $t('git.batchRevertOrder');
     const lines: string[] = [orderNote, ''];
     for (const commit of commits) {
         const subject = commit.message.split('\n')[0] ?? commit.message;
@@ -133,7 +134,7 @@ export function buildBatchActionMessage(
     }
     const mergeCount = commits.filter((commit) => commit.parents.length > 1).length;
     if (mergeCount > 0) {
-        lines.push('', `${mergeCount} merge commit(s) will use the mainline parent (parent 1).`);
+        lines.push('', $t('git.batchMergeParentNote', { count: mergeCount }));
     }
     return lines.join('\n');
 }

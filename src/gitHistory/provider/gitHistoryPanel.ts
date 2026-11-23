@@ -11,7 +11,7 @@ import { MessageRouter } from './messageRouter';
 import { PanelHandler } from './panelHandler';
 import { buildGitHistoryInitPayload } from '../util/gitHistoryInitPayload';
 import { resolvePreferredRepo } from '../util/resolveGitHistoryCommandContext';
-import { Global } from '@/common/global';
+import { Global, i18n } from '@/common/global';
 import {
     getFileHistorySplitLayout,
     type FileHistorySplitLayout,
@@ -125,8 +125,8 @@ export class GitHistoryPanel {
         const layout = getFileHistorySplitLayout(context);
         const column = resolveViewColumn(panelContext);
         const title = panelContext.fileUri
-            ? `Git History (${nodePath.basename(panelContext.fileUri.fsPath)})`
-            : 'Git History';
+            ? i18n('ext.git.panelTitleFile', nodePath.basename(panelContext.fileUri.fsPath))
+            : i18n('ext.git.panelTitle');
         let id = GIT_HISTORY_VIEW_TYPE;
         if (/Cursor/i.test(vscode.env.appName)) id += Date.now();
         const panel = vscode.window.createWebviewPanel(

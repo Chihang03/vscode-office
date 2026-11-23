@@ -114,7 +114,7 @@ async function runQuickSyncCommand(): Promise<void> {
     await repoDiscovery.discover();
     const repos = repoDiscovery.getRepos();
     if (repos.length === 0) {
-        vscode.window.showWarningMessage('No Git repository found.');
+        vscode.window.showWarningMessage(i18n('ext.git.noRepoFound'));
         return;
     }
 
@@ -122,17 +122,17 @@ async function runQuickSyncCommand(): Promise<void> {
         ? repos[0]
         : await vscode.window.showQuickPick(
             [...repos],
-            { title: 'Quick Sync', placeHolder: 'Select repository' },
+            { title: i18n('ext.git.quickSyncTitle'), placeHolder: i18n('ext.git.selectRepo') },
         );
     if (!repo) return;
 
     const branch = await gitActions.getCurrentBranch(repo);
     if (!branch) {
-        vscode.window.showErrorMessage('Unable to get the current branch.');
+        vscode.window.showErrorMessage(i18n('ext.git.unableToGetBranch'));
         return;
     }
     if (branch === 'HEAD') {
-        vscode.window.showWarningMessage('Quick Sync is unavailable in detached HEAD state.');
+        vscode.window.showWarningMessage(i18n('ext.git.quickSyncDetachedHead'));
         return;
     }
 
@@ -143,16 +143,16 @@ async function runQuickSyncCommand(): Promise<void> {
             ? remotes[0]
             : await vscode.window.showQuickPick(
                 remotes,
-                { title: 'Quick Sync', placeHolder: 'Select remote' },
+                { title: i18n('ext.git.quickSyncTitle'), placeHolder: i18n('ext.git.selectRemote') },
             );
     if (remote === undefined) return;
 
     const hasUncommittedChanges = await gitActions.hasUncommittedChanges(repo);
-    let commitMessage = await getGitInputCommitMessage(repo) || 'Quick Sync';
+    let commitMessage = await getGitInputCommitMessage(repo) || i18n('ext.git.quickSyncTitle');
     if (hasUncommittedChanges) {
         const input = await vscode.window.showInputBox({
-            title: 'Quick Sync',
-            prompt: 'Commit message',
+            title: i18n('ext.git.quickSyncTitle'),
+            prompt: i18n('ext.git.commitMessage'),
             value: commitMessage,
         });
         if (input === undefined) return;
@@ -160,7 +160,7 @@ async function runQuickSyncCommand(): Promise<void> {
     }
 
     await vscode.window.withProgress(
-        { location: vscode.ProgressLocation.Notification, title: 'Git: Quick Sync', cancellable: false },
+        { location: vscode.ProgressLocation.Notification, title: i18n('ext.git.quickSyncProgressTitle'), cancellable: false },
         async () => {
             const error = await gitActions.quickSync(repo, branch, remote, commitMessage);
             if (error) {

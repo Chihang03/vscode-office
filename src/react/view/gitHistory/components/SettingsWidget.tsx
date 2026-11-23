@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
+import { renderI18nTemplate } from '../util/i18nTemplate';
 import type { GitPullDefaults, FileHistorySplitLayout } from '../util/gitHistoryState';
 import type { GitRemoteDetail } from '../types';
 import { getConfigs } from '../../../util/vscodeConfig';
@@ -91,28 +93,28 @@ export default function SettingsWidget({
     };
 
     return (
-        <aside className="git-graph-settings-panel" aria-label="Settings">
+        <aside className="git-graph-settings-panel" aria-label={$t('git.settings')}>
             <div className="git-graph-settings-body">
                 <section className="git-graph-settings-group">
                     <div className="git-graph-settings-group-header">
-                        <h2>Repository Settings</h2>
-                        <button type="button" className="git-graph-icon-btn" title="Close" onClick={onClose}>
+                        <h2>{$t('git.repoSettings')}</h2>
+                        <button type="button" className="git-graph-icon-btn" title={$t('common.close')} onClick={onClose}>
                             <span className="codicon codicon-close" aria-hidden />
                         </button>
                     </div>
                     <div className="git-graph-settings-group-content">
                         <div className="git-graph-settings-section">
-                            <h3>Remote Configuration</h3>
+                            <h3>{$t('git.remoteConfig')}</h3>
                             {loading ? (
-                                <p className="git-graph-muted">Loading remotes...</p>
+                                <p className="git-graph-muted">{$t('git.loadingRemotes')}</p>
                             ) : remotes.length === 0 ? (
-                                <p className="git-graph-muted">No remotes configured for this repository.</p>
+                                <p className="git-graph-muted">{$t('git.noRemotesConfigured')}</p>
                             ) : (
                                 <table className="git-graph-settings-table">
                                     <thead>
                                         <tr>
-                                            <th>Remote</th>
-                                            <th>URL</th>
+                                            <th>{$t('git.remoteCol')}</th>
+                                            <th>{$t('git.urlCol')}</th>
                                             <th />
                                         </tr>
                                     </thead>
@@ -121,13 +123,13 @@ export default function SettingsWidget({
                                             <tr key={remote.name}>
                                                 <td>{remote.name}</td>
                                                 <td className="git-graph-settings-url" title={remote.url ?? ''}>
-                                                    {remote.url ?? 'Not Set'}
+                                                    {remote.url ?? $t('git.notSet')}
                                                 </td>
                                                 <td className="git-graph-settings-actions">
                                                     <button
                                                         type="button"
                                                         className="git-graph-icon-btn git-graph-settings-action-copy"
-                                                        title={copiedRemoteName === remote.name ? 'Copied' : 'Copy remote URL'}
+                                                        title={copiedRemoteName === remote.name ? $t('common.copied') : $t('git.copyRemoteUrl')}
                                                         onClick={() => void handleCopyRemote(remote)}
                                                         disabled={!remote.url}
                                                     >
@@ -139,7 +141,7 @@ export default function SettingsWidget({
                                                     <button
                                                         type="button"
                                                         className="git-graph-icon-btn git-graph-settings-action-edit"
-                                                        title="Edit remote"
+                                                        title={$t('git.editRemote')}
                                                         onClick={() => onEditRemote(remote.name)}
                                                     >
                                                         <span className="codicon codicon-edit" aria-hidden />
@@ -147,7 +149,7 @@ export default function SettingsWidget({
                                                     <button
                                                         type="button"
                                                         className="git-graph-icon-btn git-graph-settings-action-delete"
-                                                        title="Delete remote"
+                                                        title={$t('git.deleteRemoteBtn')}
                                                         onClick={() => onDeleteRemote(remote.name)}
                                                     >
                                                         <span className="codicon codicon-trash" aria-hidden />
@@ -161,15 +163,17 @@ export default function SettingsWidget({
                             <div className="git-graph-settings-section-actions">
                                 <button type="button" className="git-graph-settings-btn" onClick={onAddRemote}>
                                     <span className="codicon codicon-add" aria-hidden />
-                                    Add Remote
+                                    {$t('git.addRemote')}
                                 </button>
                             </div>
                         </div>
 
                         <div className="git-graph-settings-section">
-                            <h3>Default Pull Behaviour</h3>
+                            <h3>{$t('git.defaultPullBehaviour')}</h3>
                             <p className="git-graph-settings-hint">
-                                Applied when pulling from the context menu for <strong>{repoLabel}</strong>.
+                                {renderI18nTemplate('git.defaultPullHint', {
+                                    repo: <strong>{repoLabel}</strong>,
+                                })}
                             </p>
                             <label className="git-graph-settings-checkbox">
                                 <input
@@ -180,7 +184,7 @@ export default function SettingsWidget({
                                         onPullDefaultsChange(next);
                                     }}
                                 />
-                                <span>No Fast Forward (--no-ff)</span>
+                                <span>{$t('git.noFastForward')}</span>
                             </label>
                             <label className="git-graph-settings-checkbox">
                                 <input
@@ -191,7 +195,7 @@ export default function SettingsWidget({
                                         onPullDefaultsChange(next);
                                     }}
                                 />
-                                <span>Squash (--squash)</span>
+                                <span>{$t('git.squashOption')}</span>
                             </label>
                         </div>
                     </div>
@@ -199,13 +203,13 @@ export default function SettingsWidget({
 
                 <section className="git-graph-settings-group">
                     <div className="git-graph-settings-group-header">
-                        <h2>Extension Settings</h2>
+                        <h2>{$t('git.extensionSettings')}</h2>
                     </div>
                     <div className="git-graph-settings-group-content">
                         <div className="git-graph-settings-section">
-                            <h3>File History Split</h3>
+                            <h3>{$t('git.fileHistorySplit')}</h3>
                             <p className="git-graph-settings-hint">
-                                Editor layout when opening file Git history beside the current file.
+                                {$t('git.fileHistorySplitHint')}
                             </p>
                             <label className="git-graph-settings-radio">
                                 <input
@@ -214,7 +218,7 @@ export default function SettingsWidget({
                                     checked={fileHistorySplitLayout === 'vertical'}
                                     onChange={() => onFileHistorySplitLayoutChange('vertical')}
                                 />
-                                <span>Vertical (stacked)</span>
+                                <span>{$t('git.splitVertical')}</span>
                             </label>
                             <label className="git-graph-settings-radio">
                                 <input
@@ -223,14 +227,14 @@ export default function SettingsWidget({
                                     checked={fileHistorySplitLayout === 'horizontal'}
                                     onChange={() => onFileHistorySplitLayoutChange('horizontal')}
                                 />
-                                <span>Horizontal (side by side)</span>
+                                <span>{$t('git.splitHorizontal')}</span>
                             </label>
                         </div>
 
                         <div className="git-graph-settings-section">
-                            <h3>Source Control</h3>
+                            <h3>{$t('git.sourceControl')}</h3>
                             <p className="git-graph-settings-hint">
-                                Show the Quick Sync button in the Source Control (Git) title toolbar.
+                                {$t('git.quickSyncButtonHint')}
                             </p>
                             <label className="git-graph-settings-checkbox">
                                 <input
@@ -242,7 +246,7 @@ export default function SettingsWidget({
                                         handler.emit('updateConfig', { key: 'gitHistory.quickSyncButton', value: next });
                                     }}
                                 />
-                                <span>Show Quick Sync button</span>
+                                <span>{$t('git.showQuickSyncButton')}</span>
                             </label>
                         </div>
                     </div>

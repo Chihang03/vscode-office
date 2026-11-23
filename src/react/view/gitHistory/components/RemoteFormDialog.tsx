@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitRemoteDetail } from '../types';
 import DialogOverlay from './DialogOverlay';
 
@@ -25,7 +26,7 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
         return () => document.removeEventListener('keydown', onKey);
     }, [onCancel]);
 
-    const title = mode === 'add' ? 'Add Remote' : 'Edit Remote';
+    const title = mode === 'add' ? $t('git.addRemote') : $t('git.editRemoteTitle');
     const canSubmit = name.trim().length > 0 && url.trim().length > 0;
 
     return (
@@ -39,13 +40,13 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
             >
                 <div className="git-graph-dialog-header">
                     <h2>{title}</h2>
-                    <button type="button" className="git-graph-icon-btn" title="Cancel" onClick={onCancel}>
+                    <button type="button" className="git-graph-icon-btn" title={$t('common.cancel')} onClick={onCancel}>
                         <span className="codicon codicon-close" aria-hidden />
                     </button>
                 </div>
                 <div className="git-graph-dialog-body">
                     <label className="git-graph-dialog-field">
-                        <span className="git-graph-dialog-label">Remote name</span>
+                        <span className="git-graph-dialog-label">{$t('git.remoteName')}</span>
                         <input
                             type="text"
                             className="vscode-input"
@@ -56,7 +57,7 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
                         />
                     </label>
                     <label className="git-graph-dialog-field">
-                        <span className="git-graph-dialog-label">Fetch URL</span>
+                        <span className="git-graph-dialog-label">{$t('git.fetchUrl')}</span>
                         <input
                             type="text"
                             className="vscode-input"
@@ -66,11 +67,11 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
                         />
                     </label>
                     <label className="git-graph-dialog-field">
-                        <span className="git-graph-dialog-label">Push URL (optional)</span>
+                        <span className="git-graph-dialog-label">{$t('git.pushUrlOptional')}</span>
                         <input
                             type="text"
                             className="vscode-input"
-                            placeholder="Leave blank to use the Fetch URL"
+                            placeholder={$t('git.pushUrlPlaceholder')}
                             value={pushUrl}
                             onChange={(e) => setPushUrl(e.target.value)}
                         />
@@ -78,7 +79,7 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
                 </div>
                 <div className="git-graph-dialog-footer">
                     <button type="button" className="git-graph-dialog-btn" onClick={onCancel}>
-                        Cancel
+                        {$t('common.cancel')}
                     </button>
                     <button
                         type="button"
@@ -86,7 +87,7 @@ export default function RemoteFormDialog({ mode, remote, onCancel, onSubmit }: R
                         disabled={!canSubmit}
                         onClick={() => onSubmit({ name: name.trim(), url: url.trim(), pushUrl: pushUrl.trim() })}
                     >
-                        {mode === 'add' ? 'Add' : 'Save'}
+                        {mode === 'add' ? $t('git.add') : $t('common.save')}
                     </button>
                 </div>
             </div>

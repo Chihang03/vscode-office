@@ -1,5 +1,7 @@
 import { Spin } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
+import { renderI18nTemplate } from '../util/i18nTemplate';
 import type { FormField, PromptStep, PromptSubmitValue } from '../util/gitActionPromptFlow';
 import type { PopupAnchor } from '../util/commitDetailPopup';
 import { AnchoredDialog, AnchoredDialogActions } from './AnchoredDialog';
@@ -326,7 +328,7 @@ export default function ActionDialog({
         return () => document.removeEventListener('keydown', onKey);
     }, [onCancel]);
 
-    let primaryLabel = 'OK';
+    let primaryLabel = $t('git.ok');
     let primaryDisabled = false;
     let repositionDeps: unknown[] = [];
     let message: ReactNode = null;
@@ -335,12 +337,9 @@ export default function ActionDialog({
     if (step.kind === 'confirm') {
         primaryLabel = step.confirmLabel;
         if (anchored && step.variant === 'revertCommit' && step.commitHash) {
-            message = (
-                <>
-                    Are you sure you want to revert commit{' '}
-                    <strong><em>{abbrevHash(step.commitHash)}</em></strong>?
-                </>
-            );
+            message = renderI18nTemplate('git.confirmRevertCommit', {
+                hash: <strong><em>{abbrevHash(step.commitHash)}</em></strong>,
+            });
         } else {
             message = step.message;
         }
@@ -383,7 +382,7 @@ export default function ActionDialog({
         }
         repositionDeps = [step.message, step.variant, step.commitHash];
     } else if (step.kind === 'input') {
-        primaryLabel = 'Continue';
+        primaryLabel = $t('git.continue');
         primaryDisabled = !step.optional && !inputValue.trim();
         if (anchored) {
             message = step.title;
@@ -452,11 +451,9 @@ export default function ActionDialog({
         }
         if (anchored) {
             if (step.variant === 'createBranch') {
-                message = (
-                    <>
-                        Create branch at commit <em>{abbrevHash(step.commitHash ?? '')}</em>:
-                    </>
-                );
+                message = renderI18nTemplate('git.createBranchAtCommit', {
+                    hash: <em>{abbrevHash(step.commitHash ?? '')}</em>,
+                });
                 body = renderAnchoredFormFields(
                     step.fields,
                     formValues,
@@ -465,11 +462,9 @@ export default function ActionDialog({
                     () => Boolean(formValues.branchName?.trim()),
                 );
             } else if (step.variant === 'addTag') {
-                message = (
-                    <>
-                        Add tag to commit <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>:
-                    </>
-                );
+                message = renderI18nTemplate('git.addTagToCommit', {
+                    hash: <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>,
+                });
                 body = renderAnchoredFormFields(
                     step.fields,
                     formValues,
@@ -478,28 +473,22 @@ export default function ActionDialog({
                     () => Boolean(formValues.tagName?.trim()),
                 );
             } else if (step.variant === 'deleteBranch') {
-                message = (
-                    <>
-                        Are you sure you want to delete the branch{' '}
-                        <strong><em>{step.branchName}</em></strong>?
-                    </>
-                );
+                message = renderI18nTemplate('git.confirmDeleteBranch', {
+                    branch: <strong><em>{step.branchName}</em></strong>,
+                });
                 body = renderAnchoredCheckboxList(step.fields, formValues, setFormValues, true);
             } else if (step.variant === 'merge') {
-                message = (
-                    <>
-                        Are you sure you want to merge {step.mergeOn}{' '}
-                        <DialogEmphasis>{step.mergeTarget}</DialogEmphasis> into{' '}
-                        {step.branchName ? (
-                            <>
-                                <DialogEmphasis>{step.branchName}</DialogEmphasis> (the current branch)
-                            </>
-                        ) : (
-                            'the current branch'
-                        )}
-                        ?
-                    </>
-                );
+                const mergeKindLabel = $t(step.mergeOn === 'commit' ? 'git.commit' : 'git.branch');
+                message = step.branchName
+                    ? renderI18nTemplate('git.confirmMergeIntoBranch', {
+                        kind: mergeKindLabel,
+                        target: <DialogEmphasis>{step.mergeTarget}</DialogEmphasis>,
+                        branch: <DialogEmphasis>{step.branchName}</DialogEmphasis>,
+                    })
+                    : renderI18nTemplate('git.confirmMergeIntoCurrent', {
+                        kind: mergeKindLabel,
+                        target: <DialogEmphasis>{step.mergeTarget}</DialogEmphasis>,
+                    });
                 body = renderAnchoredCheckboxList(
                     step.fields,
                     formValues,
@@ -508,12 +497,9 @@ export default function ActionDialog({
                     'git-graph-anchored-dialog-checkbox-list--styled git-graph-anchored-dialog-checkbox-list--merge',
                 );
             } else if (step.variant === 'cherryPick') {
-                message = (
-                    <>
-                        Are you sure you want to cherry pick commit{' '}
-                        <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>?
-                    </>
-                );
+                message = renderI18nTemplate('git.confirmCherryPickCommit', {
+                    hash: <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>,
+                });
                 body = (
                     <>
                         {step.fields.some((field) => field.type === 'select') && (
@@ -686,12 +672,12 @@ export default function ActionDialog({
         }
         repositionDeps = [formValues, step.message, step.variant];
     } else {
-        primaryLabel = step.submitLabel ?? 'Continue';
+        primaryLabel = step.submitLabel ?? $t('git.continue');
         primaryDisabled = step.options.length > 0 && !pickValue;
         if (step.variant === 'pushRemote') {
-            primaryLabel = step.submitLabel ?? 'Push';
+            primaryLabel = step.submitLabel ?? $t('git.push');
         } else if (step.variant === 'openRemote') {
-            primaryLabel = step.submitLabel ?? 'Open';
+            primaryLabel = step.submitLabel ?? $t('git.open');
         }
         const submitPick = (value: string) => {
             if (step.fields?.length) {
@@ -707,20 +693,15 @@ export default function ActionDialog({
             ? renderAnchoredCheckboxList(step.fields, formValues, setFormValues)
             : null;
         if (anchored && step.variant === 'resetMode') {
-            primaryLabel = step.submitLabel ?? 'Reset';
-            message = (
-                <>
-                    Are you sure you want to reset{' '}
-                    {step.branchName ? (
-                        <>
-                            <strong><em>{step.branchName}</em></strong> (the current branch)
-                        </>
-                    ) : (
-                        'the current branch'
-                    )}
-                    {' '}to commit <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>?
-                </>
-            );
+            primaryLabel = step.submitLabel ?? $t('git.reset');
+            message = step.branchName
+                ? renderI18nTemplate('git.confirmResetBranchToCommit', {
+                    branch: <strong><em>{step.branchName}</em></strong>,
+                    hash: <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>,
+                })
+                : renderI18nTemplate('git.confirmResetCurrentToCommit', {
+                    hash: <strong><em>{abbrevHash(step.commitHash ?? '')}</em></strong>,
+                });
             body = renderAnchoredOptionList(
                 step.options,
                 pickValue,
@@ -817,14 +798,14 @@ export default function ActionDialog({
             >
                 <div className="git-graph-dialog-header">
                     <h2>{step.title}</h2>
-                    <button type="button" className="git-graph-icon-btn" title="Cancel" onClick={onCancel} disabled={isExecuting}>
+                    <button type="button" className="git-graph-icon-btn" title={$t('common.cancel')} onClick={onCancel} disabled={isExecuting}>
                         <span className="codicon codicon-close" aria-hidden />
                     </button>
                 </div>
                 <div className="git-graph-dialog-body">{body}</div>
                 <div className="git-graph-dialog-footer">
                     <button type="button" className="git-graph-dialog-btn" onClick={onCancel} disabled={isExecuting}>
-                        Cancel
+                        {$t('common.cancel')}
                     </button>
                     <button
                         type="button"

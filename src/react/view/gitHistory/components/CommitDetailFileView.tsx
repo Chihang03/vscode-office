@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { MouseEvent } from 'react';
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitFileChange } from '../types';
 import { fileTouchesPath } from '../util/repoPath';
 import {
@@ -123,7 +124,7 @@ function FileChangeRow({
             />
             <span className="git-graph-cdv-file-name" title={title}>{label}</span>
             {badgeLabel && (
-                <span className={`git-graph-cdv-file-badge git-graph-cdv-file-badge-${change.type.toLowerCase()}`} aria-label={`Status ${badgeLabel}`}>
+                <span className={`git-graph-cdv-file-badge git-graph-cdv-file-badge-${change.type.toLowerCase()}`} aria-label={$t('git.fileStatusBadge', { status: badgeLabel })}>
                     {badgeLabel}
                 </span>
             )}
@@ -134,8 +135,8 @@ function FileChangeRow({
                     <button
                         type="button"
                         className="git-graph-cdv-file-action-btn"
-                        title="View file at this revision"
-                        aria-label="View file at this revision"
+                        title={$t('git.viewFileAtRevision')}
+                        aria-label={$t('git.viewFileAtRevision')}
                         onClick={(event) => {
                             event.stopPropagation();
                             onFileAction(buildViewFileAtRevisionAction(repo, commitHash, change));
@@ -148,8 +149,8 @@ function FileChangeRow({
                     <button
                         type="button"
                         className="git-graph-cdv-file-action-btn"
-                        title="Open current file"
-                        aria-label="Open current file"
+                        title={$t('git.openCurrentFile')}
+                        aria-label={$t('git.openCurrentFile')}
                         onClick={(event) => {
                             event.stopPropagation();
                             onFileAction(buildOpenFileAction(repo, change));

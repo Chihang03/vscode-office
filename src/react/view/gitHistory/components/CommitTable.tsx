@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { MouseEvent, ReactNode, CSSProperties } from 'react';
 import { Typography } from 'antd';
+import { $t } from '../../../i18n/i18nConfig';
 import type { GitCommit, GitCommitRemote } from '../types';
 import type { GraphConfig } from '../graph/layoutEngine';
 import { computeGraphLayout } from '../graph/layoutEngine';
@@ -179,7 +180,7 @@ function RefTags({
             <RefLabel
                 key="stash"
                 kind="stash"
-                name="stash"
+                name={$t('git.stashBadge')}
                 className="git-graph-ref-stash"
                 onContextMenu={(e) => stopContextMenu(e, () => onRefContextMenu(e, commit, 'stash', commit.stash!.selector))}
             />
@@ -202,8 +203,8 @@ function CommitHeadDot({
     }
     const checkedOutBranch = getCheckedOutBranchLabel(branchHead);
     const title = checkedOutBranch !== null
-        ? `The branch "${checkedOutBranch}" is currently checked out at this commit.`
-        : 'This commit is currently checked out.';
+        ? $t('git.checkedOutBranchTooltip', { branch: checkedOutBranch })
+        : $t('git.checkedOutCommitTooltip');
     return <span className="git-graph-commit-head-dot" title={title} />;
 }
 
@@ -236,7 +237,7 @@ export default function CommitTable({
     return (
         <div className="git-graph-table-wrapper">
             <div className="git-graph-graph-col">
-                <div className="git-graph-graph-header">Graph</div>
+                <div className="git-graph-graph-header">{$t('git.graph')}</div>
                 <GraphSvg
                     layout={layout}
                     selectedIndices={selectedIndices}
@@ -246,10 +247,10 @@ export default function CommitTable({
             </div>
             <div className="git-graph-commits-col">
                 <div className="git-graph-table-header">
-                    <span className="col-desc">Message</span>
-                    <span className="col-date">Date</span>
-                    <span className="col-author">Author</span>
-                    <span className="col-hash">Hash</span>
+                    <span className="col-desc">{$t('git.message')}</span>
+                    <span className="col-date">{$t('git.date')}</span>
+                    <span className="col-author">{$t('git.author')}</span>
+                    <span className="col-hash">{$t('git.hash')}</span>
                 </div>
                 <div className="git-graph-table-body">
                     {commits.map((commit, index) => {
