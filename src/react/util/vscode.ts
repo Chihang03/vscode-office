@@ -53,6 +53,12 @@ const getVscodeEvent = () => {
             events[event] = data
             return this;
         },
+        off(event: string, data?: any) {
+            if (!data || events[event] === data) {
+                delete events[event];
+            }
+            return this;
+        },
         emit(event: string, data?: any) {
             postMessage({ type: event, content: data })
         }

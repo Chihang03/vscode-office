@@ -82,6 +82,7 @@ export default function DevLogExportDialog({
     const statsRequestIdRef = useRef<number>(0);
     const exportRequestIdRef = useRef<number>(0);
     const fetchedHashesRef = useRef<Set<string>>(new Set());
+    const inFlightHashesRef = useRef<Set<string>>(new Set());
     const lastRepoRef = useRef<string>(repo);
 
     // Sync template & range when dialog opens
@@ -102,6 +103,7 @@ export default function DevLogExportDialog({
         if (lastRepoRef.current !== repo) {
             lastRepoRef.current = repo;
             fetchedHashesRef.current = new Set();
+            inFlightHashesRef.current = new Set();
             setStatsMap({});
         }
     }, [repo]);
@@ -123,10 +125,16 @@ export default function DevLogExportDialog({
     useEffect(() => {
         if (!open) return;
         const onStatsResult = (payload: { requestId: number; stats: Record<string, DevLogCommitStat>; error: string | null }) => {
-            if (payload.requestId !== statsRequestIdRef.current) return;
-            setLoadingStats(false);
             if (payload.stats) {
+                for (const hash of Object.keys(payload.stats)) {
+                    fetchedHashesRef.current.add(hash);
+                    inFlightHashesRef.current.delete(hash);
+                }
                 setStatsMap((prev) => ({ ...prev, ...payload.stats }));
+            }
+            if (payload.requestId === statsRequestIdRef.current) {
+                inFlightHashesRef.current.clear();
+                setLoadingStats(false);
             }
         };
         const onExportResult = (payload: { requestId: number; savedPath: string | null; error: string | null; cancelled?: boolean }) => {
@@ -144,6 +152,8 @@ export default function DevLogExportDialog({
         return () => {
             handler.off('devLogStatsResult', onStatsResult);
             handler.off('exportDevLogResult', onExportResult);
+            inFlightHashesRef.current.clear();
+            setLoadingStats(false);
         };
     }, [open]);
 
@@ -158,11 +168,11 @@ export default function DevLogExportDialog({
         if (!open || !repo || !needsStats) return;
         const missing = filteredCommits
             .map((c) => c.hash)
-            .filter((h) => h && h !== '*' && !fetchedHashesRef.current.has(h));
+            .filter((h) => h && h !== '*' && !fetchedHashesRef.current.has(h) && !inFlightHashesRef.current.has(h));
         if (missing.length === 0) return;
 
         for (const h of missing) {
-            fetchedHashesRef.current.add(h);
+            inFlightHashesRef.current.add(h);
         }
         const reqId = nextRequestId++;
         statsRequestIdRef.current = reqId;
