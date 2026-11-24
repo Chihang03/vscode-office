@@ -379,7 +379,7 @@ function buildBaseStyles(isDark: boolean, template: DevLogTemplate): string {
             padding: ${template === 'report' ? '24px 28px 36px' : '28px 28px 40px'};
         }
         @media print {
-            body { background: ${isDark ? bg : '#ffffff'}; }
+            html, body { background: ${isDark ? bg : '#ffffff'}; }
             .page { max-width: none; padding: 0; }
         }
         .stat-add { color: var(--add); font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
@@ -394,8 +394,12 @@ function buildBaseStyles(isDark: boolean, template: DevLogTemplate): string {
             border: 1px solid var(--border);
         }
         .badge {
-            display: inline-flex;
-            align-items: center;
+            display: inline-block;
+            max-width: 175px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 0;
             font-size: 10.5px;
             font-weight: 600;
             padding: 1px 6px;
@@ -961,8 +965,100 @@ function renderReportHtml(ctx: DevLogRenderContext, summary: SummaryMetrics): st
 }
 
 // ============================================================================
-// Template C: Branch Graph Snapshot (WYSIWYG Git Graph + Table)
+// Template C: Branch Graph Snapshot (WYSIWYG Git Graph + Paginated Table)
 // ============================================================================
+interface GraphSegment {
+    kind: 'vertical' | 'curve';
+    x: number;
+    d: string;
+    minY: number;
+    maxY: number;
+    color: string;
+    dashed: boolean;
+    dimmed: boolean;
+}
+
+function extractGraphSegments(
+    paths: ReadonlyArray<{ d: string; color: string; dashed: boolean; dimmed?: boolean }>,
+): GraphSegment[] {
+    const segments: GraphSegment[] = [];
+    const cmdRe = /([MLC])([^MLC]+)/g;
+    const pairRe = /(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g;
+
+    for (const p of paths) {
+        let cx = 0;
+        let cy = 0;
+        let match: RegExpExecArray | null;
+        cmdRe.lastIndex = 0;
+        while ((match = cmdRe.exec(p.d)) !== null) {
+            const type = match[1];
+            const argsStr = match[2];
+            const pts: [number, number][] = [];
+            let pm: RegExpExecArray | null;
+            pairRe.lastIndex = 0;
+            while ((pm = pairRe.exec(argsStr)) !== null) {
+                pts.push([parseFloat(pm[1]), parseFloat(pm[2])]);
+            }
+            if (pts.length === 0) continue;
+
+            if (type === 'M') {
+                [cx, cy] = pts[pts.length - 1];
+            } else if (type === 'L') {
+                for (const [nx, ny] of pts) {
+                    const minY = Math.min(cy, ny);
+                    const maxY = Math.max(cy, ny);
+                    if (cx === nx) {
+                        segments.push({
+                            kind: 'vertical',
+                            x: cx,
+                            d: '',
+                            minY,
+                            maxY,
+                            color: p.color,
+                            dashed: p.dashed,
+                            dimmed: Boolean(p.dimmed),
+                        });
+                    } else {
+                        segments.push({
+                            kind: 'curve',
+                            x: cx,
+                            d: `M${cx},${cy}L${nx},${ny}`,
+                            minY,
+                            maxY,
+                            color: p.color,
+                            dashed: p.dashed,
+                            dimmed: Boolean(p.dimmed),
+                        });
+                    }
+                    cx = nx;
+                    cy = ny;
+                }
+            } else if (type === 'C' && pts.length >= 3) {
+                for (let k = 0; k + 2 < pts.length; k += 3) {
+                    const [c1x, c1y] = pts[k];
+                    const [c2x, c2y] = pts[k + 1];
+                    const [nx, ny] = pts[k + 2];
+                    const minY = Math.min(cy, c1y, c2y, ny);
+                    const maxY = Math.max(cy, c1y, c2y, ny);
+                    segments.push({
+                        kind: 'curve',
+                        x: cx,
+                        d: `M${cx},${cy}C${c1x},${c1y} ${c2x},${c2y} ${nx},${ny}`,
+                        minY,
+                        maxY,
+                        color: p.color,
+                        dashed: p.dashed,
+                        dimmed: Boolean(p.dimmed),
+                    });
+                    cx = nx;
+                    cy = ny;
+                }
+            }
+        }
+    }
+    return segments;
+}
+
 function renderGraphSnapshotHtml(ctx: DevLogRenderContext, summary: SummaryMetrics): string {
     const isDark = ctx.options.theme === 'dark';
     const rowHeight = 28;
@@ -978,39 +1074,69 @@ function renderGraphSnapshotHtml(ctx: DevLogRenderContext, summary: SummaryMetri
     );
 
     const svgBg = isDark ? '#1e293b' : '#ffffff';
-    const pathsSvg = layout.paths.map((p) =>
-        `<path d="${p.d}" fill="none" stroke="${p.color}" stroke-width="2"${p.dashed ? ' stroke-dasharray="4 2"' : ''}${p.dimmed ? ' opacity="0.45"' : ''} />`
-    ).join('');
-
-    const verticesSvg = layout.vertices.map((v) => {
-        const ring = v.isStash && !v.isCurrent
-            ? `<circle cx="${v.cx}" cy="${v.cy}" r="5" fill="none" stroke="${v.color}" stroke-width="1.5" />`
-            : '';
-        const dot = `<circle cx="${v.cx}" cy="${v.cy}" r="${v.isCurrent ? 5.5 : 4}" fill="${v.isCurrent ? svgBg : v.color}"${v.isCurrent ? ` stroke="${v.color}" stroke-width="2.5"` : ''} />`;
-        return `${ring}${dot}`;
-    }).join('');
-
     const graphWidth = Math.max(layout.width, 48);
-    const graphSvg = `<svg width="${graphWidth}" height="${layout.height}" viewBox="0 0 ${graphWidth} ${layout.height}" style="display:block;">${pathsSvg}${verticesSvg}</svg>`;
+    const segments = extractGraphSegments(layout.paths);
 
-    const rowsHtml = commits.map((c) => {
+    const verticesByRow = new Map<number, typeof layout.vertices>();
+    for (const v of layout.vertices) {
+        const rowIdx = Math.max(0, Math.min(commits.length - 1, Math.floor(v.cy / rowHeight)));
+        const list = verticesByRow.get(rowIdx);
+        if (list) list.push(v);
+        else verticesByRow.set(rowIdx, [v]);
+    }
+
+    const renderRowSvg = (rowIdx: number): string => {
+        const rowTop = rowIdx * rowHeight;
+        const rowBottom = rowTop + rowHeight;
+        const pathParts: string[] = [];
+
+        for (const seg of segments) {
+            if (seg.maxY < rowTop - 2 || seg.minY > rowBottom + 2) {
+                continue;
+            }
+            const d = seg.kind === 'vertical'
+                ? `M${seg.x},${Math.max(seg.minY, rowTop - 1).toFixed(1)}L${seg.x},${Math.min(seg.maxY, rowBottom + 1).toFixed(1)}`
+                : seg.d;
+            const dashAttr = seg.dashed ? ` stroke-dasharray="4 2" stroke-dashoffset="${rowTop % 6}"` : '';
+            const opAttr = seg.dimmed ? ' opacity="0.45"' : '';
+            pathParts.push(`<path d="${d}" fill="none" stroke="${seg.color}" stroke-width="2"${dashAttr}${opAttr} />`);
+        }
+
+        const rowVertices = verticesByRow.get(rowIdx) ?? [];
+        const vertexParts = rowVertices.map((v) => {
+            const ring = v.isStash && !v.isCurrent
+                ? `<circle cx="${v.cx}" cy="${v.cy}" r="5" fill="none" stroke="${v.color}" stroke-width="1.5" />`
+                : '';
+            const dot = `<circle cx="${v.cx}" cy="${v.cy}" r="${v.isCurrent ? 5.5 : 4}" fill="${v.isCurrent ? svgBg : v.color}"${v.isCurrent ? ` stroke="${v.color}" stroke-width="2.5"` : ''} />`;
+            return `${ring}${dot}`;
+        });
+
+        return `<svg width="${graphWidth}" height="${rowHeight}" viewBox="0 ${rowTop} ${graphWidth} ${rowHeight}" style="display:block;width:${graphWidth}px;height:${rowHeight}px;">${pathParts.join('')}${vertexParts.join('')}</svg>`;
+    };
+
+    const rowsHtml = commits.map((c, idx) => {
         const stat = ctx.stats[c.hash];
         const statInline = ctx.options.includeFiles && stat && stat.filesChanged > 0
             ? `<span class="gs-stat"><span class="stat-add">+${stat.additions}</span> <span class="stat-del">-${stat.deletions}</span></span>`
             : '';
         return `
-            <div class="gs-row" style="height:${rowHeight}px;">
-                <span class="gs-col-msg">
-                    ${renderRefBadgesHtml(c)}
-                    <span class="gs-msg-text">${escapeHtml(c.message)}</span>
-                    ${statInline}
-                </span>
-                <span class="gs-col-author">${escapeHtml(c.author)}</span>
-                <span class="gs-col-date">${escapeHtml(formatDateTimeShort(c.date))}</span>
-                <span class="gs-col-hash"><code>${escapeHtml(c.hash.slice(0, 7))}</code></span>
-            </div>
+            <tr class="gs-tr">
+                <td class="gs-td-graph">${renderRowSvg(idx)}</td>
+                <td class="gs-td-msg">
+                    <div class="gs-cell gs-col-msg">
+                        ${renderRefBadgesHtml(c)}
+                        <span class="gs-msg-text">${escapeHtml(c.message)}</span>
+                        ${statInline}
+                    </div>
+                </td>
+                <td class="gs-td-author"><div class="gs-cell gs-col-author">${escapeHtml(c.author)}</div></td>
+                <td class="gs-td-date"><div class="gs-cell gs-col-date">${escapeHtml(formatDateTimeShort(c.date))}</div></td>
+                <td class="gs-td-hash"><div class="gs-cell gs-col-hash"><code>${escapeHtml(c.hash.slice(0, 7))}</code></div></td>
+            </tr>
         `;
     }).join('');
+
+    const rowDivider = isDark ? 'rgba(51,65,85,0.45)' : 'rgba(226,232,240,0.7)';
 
     const extraCss = `
         .gs-header {
@@ -1027,63 +1153,94 @@ function renderGraphSnapshotHtml(ctx: DevLogRenderContext, summary: SummaryMetri
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 10px;
-            overflow: hidden;
         }
-        .gs-table-head {
-            display: flex;
-            align-items: center;
+        .gs-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .gs-table thead {
+            display: table-header-group;
+        }
+        .gs-table thead th {
+            height: 30px;
+            padding: 0 8px 0 0;
             background: var(--surface-subtle);
             border-bottom: 1px solid var(--border);
             font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
-            height: 30px;
+            text-align: left;
+            white-space: nowrap;
         }
-        .gs-head-graph { flex-shrink: 0; padding: 0 10px; }
-        .gs-head-cols { flex: 1; display: flex; align-items: center; min-width: 0; padding-right: 10px; }
-        .gs-body { display: flex; align-items: flex-start; }
-        .gs-graph-col { flex-shrink: 0; }
-        .gs-rows-col { flex: 1; min-width: 0; }
-        .gs-row {
+        .gs-table thead th.gs-th-graph {
+            padding-left: 10px;
+            border-top-left-radius: 9px;
+        }
+        .gs-table thead th.gs-th-hash {
+            text-align: right;
+            padding-right: 10px;
+            border-top-right-radius: 9px;
+        }
+        .gs-tr {
+            height: ${rowHeight}px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .gs-tr td {
+            padding: 0;
+            border: none;
+            height: ${rowHeight}px;
+            vertical-align: top;
+        }
+        .gs-td-graph {
+            line-height: 0;
+            font-size: 0;
+            width: ${graphWidth}px;
+        }
+        .gs-cell {
+            height: ${rowHeight}px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid ${isDark ? 'rgba(51,65,85,0.45)' : 'rgba(226,232,240,0.65)'};
-            padding-right: 10px;
+            overflow: hidden;
             font-size: 12px;
+            line-height: 1.35;
+            box-shadow: inset 0 -1px 0 ${rowDivider};
         }
-        .gs-row:last-child { border-bottom: none; }
+        .gs-tr:last-child .gs-cell {
+            box-shadow: none;
+        }
         .gs-col-msg {
+            min-width: 0;
+            gap: 4px;
+            padding-right: 10px;
+        }
+        .gs-msg-text {
             flex: 1;
             min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            overflow: hidden;
-            padding-right: 10px;
-        }
-        .gs-msg-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .gs-stat { flex-shrink: 0; margin-left: 6px; display: inline-flex; gap: 4px; }
-        .gs-col-author {
-            width: 110px;
-            flex-shrink: 0;
-            color: var(--text-muted);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+        .gs-stat { flex-shrink: 0; margin-left: 4px; display: inline-flex; gap: 4px; }
+        .gs-col-author {
+            color: var(--text-muted);
             padding-right: 8px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: block;
+            line-height: ${rowHeight}px;
         }
         .gs-col-date {
-            width: 116px;
-            flex-shrink: 0;
             color: var(--text-muted);
             font-size: 11px;
             white-space: nowrap;
             padding-right: 8px;
         }
         .gs-col-hash {
-            width: 62px;
-            flex-shrink: 0;
-            text-align: right;
+            justify-content: flex-end;
+            padding-right: 10px;
             font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
             font-size: 11px;
             color: var(--text-muted);
@@ -1095,8 +1252,34 @@ function renderGraphSnapshotHtml(ctx: DevLogRenderContext, summary: SummaryMetri
             padding: 8px 14px;
             background: var(--surface-subtle);
             border-top: 1px solid var(--border);
+            border-bottom-left-radius: 9px;
+            border-bottom-right-radius: 9px;
             font-size: 11.5px;
             color: var(--text-muted);
+            break-inside: avoid;
+        }
+        @media print {
+            .gs-frame {
+                border: none;
+                border-radius: 0;
+            }
+            .gs-table {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+                border-bottom: 1px solid var(--border);
+            }
+            .gs-table thead th {
+                border-top: 1px solid var(--border);
+            }
+            .gs-table thead th.gs-th-graph,
+            .gs-table thead th.gs-th-hash {
+                border-radius: 0;
+            }
+            .gs-stats-bar {
+                border: 1px solid var(--border);
+                border-top: none;
+                border-radius: 0;
+            }
         }
     `;
 
@@ -1119,19 +1302,27 @@ function renderGraphSnapshotHtml(ctx: DevLogRenderContext, summary: SummaryMetri
     </header>
     ${commits.length === 0 ? `<div class="empty-state">${escapeHtml($t('git.devLog.noCommitsInRange'))}</div>` : `
         <div class="gs-frame">
-            <div class="gs-table-head">
-                <div class="gs-head-graph" style="width:${graphWidth}px;">${escapeHtml($t('git.graph'))}</div>
-                <div class="gs-head-cols">
-                    <span class="gs-col-msg">${escapeHtml($t('git.message'))}</span>
-                    <span class="gs-col-author">${escapeHtml($t('git.author'))}</span>
-                    <span class="gs-col-date">${escapeHtml($t('git.date'))}</span>
-                    <span class="gs-col-hash">${escapeHtml($t('git.hash'))}</span>
-                </div>
-            </div>
-            <div class="gs-body">
-                <div class="gs-graph-col" style="width:${graphWidth}px;">${graphSvg}</div>
-                <div class="gs-rows-col">${rowsHtml}</div>
-            </div>
+            <table class="gs-table">
+                <colgroup>
+                    <col style="width:${graphWidth}px;" />
+                    <col />
+                    <col style="width:98px;" />
+                    <col style="width:112px;" />
+                    <col style="width:64px;" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="gs-th-graph">${escapeHtml($t('git.graph'))}</th>
+                        <th>${escapeHtml($t('git.message'))}</th>
+                        <th>${escapeHtml($t('git.author'))}</th>
+                        <th>${escapeHtml($t('git.date'))}</th>
+                        <th class="gs-th-hash">${escapeHtml($t('git.hash'))}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rowsHtml}
+                </tbody>
+            </table>
             ${ctx.options.includeStats ? `
                 <div class="gs-stats-bar">
                     <span>${escapeHtml($t('git.devLog.statCommits'))}: <strong>${summary.commitCount}</strong></span>
