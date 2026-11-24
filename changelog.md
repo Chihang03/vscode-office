@@ -1,3 +1,11 @@
+# 0.1.11 2026-11-24
+
+- 修复 Windows 下导出 Git 开发日志时浏览器启动失败报错 `Failed to launch the browser process: Code: 0` 的问题：
+  - 调整 Windows 浏览器探测顺序，优先使用 Google Chrome / Brave，再回退到 64 位与 32 位 Microsoft Edge（同步改善 Markdown 导出 PDF 的浏览器探测）。
+  - 为每次启动分配独立临时配置目录 `userDataDir`，清理 `ELECTRON_RUN_AS_NODE` 环境变量，并附加 `--disable-features=msEdgeStartupBoost,msEdgeOnRamp`、`--disable-background-mode`、`--disable-gpu` 等参数避免与 Edge 后台进程发生单例接管退出。
+  - 增加多策略启动重试（默认 headless、`headless: 'shell'`、Windows 下忽略 `--disable-extensions`）及遍历多浏览器候选的兜底逻辑；若 Puppeteer 调试通道仍被环境拦截，自动回退至浏览器原生无头 CLI（`--print-to-pdf` / `--screenshot`）完成导出。
+  - 增强 Windows 临时目录清理重试（`maxRetries` + `try/catch`），避免文件短暂占用导致导出结果误报失败，并补充明确的中文错误提示。
+
 # 0.1.10 2026-11-24
 
 - 修复 Git 开发日志“分支图快照”导出多页 PDF 时的排版错位问题：将左右分栏的整张超长 SVG 改为原生分页表格（`<table>`）与按行精确裁剪的 `28px` SVG 切片，彻底消除首页空白及跨页后“左图右文”前后分离的现象。

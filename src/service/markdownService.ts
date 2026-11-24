@@ -119,10 +119,14 @@ export class MarkdownService {
 
     private paths: string[] = [
         // Windows
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        join(process.env.LOCALAPPDATA || join(homedir(), "AppData\\Local"), "Google\\Chrome\\Application\\chrome.exe"),
+        "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
         "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
         "C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe",
         "C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe",
-        join(homedir(), "AppData\\Local\\Microsoft\\Edge SxS\\Application\\msedge.exe"),
+        join(process.env.LOCALAPPDATA || join(homedir(), "AppData\\Local"), "Microsoft\\Edge SxS\\Application\\msedge.exe"),
         // macOS
         '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',

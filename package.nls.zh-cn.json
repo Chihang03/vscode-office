@@ -24,6 +24,7 @@
 	"ext.git.unknownAction": "未知操作",
 	"ext.git.commandFailed": "Git 命令执行失败",
 	"ext.git.devLogNoChromium": "未找到 Chromium / Chrome / Edge。请安装基于 Chromium 的浏览器，或在 VS Code 设置中配置 \"kieran-document-studio.chromiumPath\"。",
+	"ext.git.devLogBrowserLaunchFailed": "无法启动浏览器（$1）。在 Windows 上请尝试关闭后台 Edge 进程（关闭“启动增强”）、以非管理员权限运行 VS Code，或在设置中将 \"kieran-document-studio.chromiumPath\" 指向 Chrome。",
 	"ext.git.devLogSaveLabel": "导出开发日志",
 	"ext.git.devLogExportSuccess": "开发日志已导出至 $1",
 	"ext.git.devLogOpenFile": "打开文件",

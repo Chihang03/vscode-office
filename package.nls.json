@@ -24,6 +24,7 @@
 	"ext.git.unknownAction": "Unknown action",
 	"ext.git.commandFailed": "Git command failed",
 	"ext.git.devLogNoChromium": "Chromium / Chrome / Edge was not found. Please install a Chromium-based browser or configure \"kieran-document-studio.chromiumPath\" in VS Code settings.",
+	"ext.git.devLogBrowserLaunchFailed": "Unable to launch Chromium/Edge ($1). On Windows, try closing background Edge processes (disable Startup Boost), running VS Code without Administrator elevation, or setting \"kieran-document-studio.chromiumPath\" to Chrome.",
 	"ext.git.devLogSaveLabel": "Export Dev Log",
 	"ext.git.devLogExportSuccess": "Dev log exported to $1",
 	"ext.git.devLogOpenFile": "Open File",

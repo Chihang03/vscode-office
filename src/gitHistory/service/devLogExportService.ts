@@ -1,3 +1,4 @@
+import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -44,38 +45,223 @@ const FIELD_SEP = '<<<KDS_DEVLOG_FIELD>>>';
 const BODY_END = '<<<KDS_DEVLOG_BODY_END>>>';
 const BATCH_SIZE = 80;
 
-const CHROMIUM_PATHS: string[] = [
-    // Windows
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-    'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe',
-    'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe',
-    path.join(os.homedir(), 'AppData\\Local\\Microsoft\\Edge SxS\\Application\\msedge.exe'),
-    // macOS
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-    '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
-    // Linux
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/snap/bin/chromium',
-    '/usr/bin/microsoft-edge',
-];
+function getCandidateBrowserPaths(): string[] {
+    const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+    return [
+        // Windows: prefer Chrome / Brave before Edge to reduce Startup Boost handoff conflicts
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+        'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe',
+        path.join(localAppData, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
+        'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe',
+        path.join(localAppData, 'Microsoft', 'Edge SxS', 'Application', 'msedge.exe'),
+        // macOS
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+        '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+        // Linux
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/snap/bin/chromium',
+        '/usr/bin/microsoft-edge',
+    ];
+}
 
-function findChromiumExecutable(): string {
-    const configured = Global.getConfig<string>('chromiumPath');
-    const candidates = [configured, ...CHROMIUM_PATHS];
+function findChromiumExecutables(): string[] {
+    const configured = Global.getConfig<string>('chromiumPath')?.trim();
+    const candidates: Array<string | undefined> = [configured, ...getCandidateBrowserPaths()];
+    try {
+        const found = chromeFinder();
+        if (found) {
+            candidates.push(found);
+        }
+    } catch {
+        // Ignore chrome-finder errors when known candidates are missing
+    }
+
+    const seen = new Set<string>();
+    const executables: string[] = [];
     for (const candidate of candidates) {
-        if (candidate && fs.existsSync(candidate)) {
-            return candidate;
+        if (!candidate) continue;
+        const normalized = process.platform === 'win32' ? candidate.toLowerCase() : candidate;
+        if (seen.has(normalized)) continue;
+        if (fs.existsSync(candidate)) {
+            seen.add(normalized);
+            executables.push(candidate);
         }
     }
-    try {
-        return chromeFinder();
-    } catch {
+
+    if (executables.length === 0) {
         throw new Error(i18n('ext.git.devLogNoChromium'));
     }
+    return executables;
+}
+
+function buildLaunchEnv(): NodeJS.ProcessEnv {
+    const env: NodeJS.ProcessEnv = { ...process.env };
+    delete env.ELECTRON_RUN_AS_NODE;
+    return env;
+}
+
+function buildBrowserBaseArgs(): string[] {
+    const userArgs = Global.getConfig<string[]>('puppeteerArgs');
+    return [
+        '--allow-file-access-from-files',
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--disable-gpu',
+        '--disable-background-mode',
+        '--disable-features=msEdgeStartupBoost,msEdgeOnRamp',
+        ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-setuid-sandbox'] : []),
+        ...(Array.isArray(userArgs) ? userArgs : []),
+    ];
+}
+
+interface BrowserLaunchAttempt {
+    headless: boolean | 'shell';
+    ignoreDefaultArgs?: string[];
+}
+
+async function launchPuppeteerBrowser(
+    puppeteer: any,
+    executables: ReadonlyArray<string>,
+    tmpDir: string,
+    baseArgs: ReadonlyArray<string>,
+    launchEnv: NodeJS.ProcessEnv,
+): Promise<{ browser: any; errors: string[] }> {
+    const errors: string[] = [];
+    let attemptIdx = 0;
+
+    const strategies: BrowserLaunchAttempt[] = [
+        { headless: true },
+        { headless: 'shell' },
+        ...(process.platform === 'win32' ? [{ headless: true, ignoreDefaultArgs: ['--disable-extensions'] }] : []),
+    ];
+
+    for (const executablePath of executables) {
+        for (const strategy of strategies) {
+            const userDataDir = path.join(tmpDir, `profile-${attemptIdx++}`);
+            try {
+                const browser = await puppeteer.launch({
+                    headless: strategy.headless,
+                    executablePath,
+                    userDataDir,
+                    ...(strategy.ignoreDefaultArgs ? { ignoreDefaultArgs: strategy.ignoreDefaultArgs } : {}),
+                    args: [...baseArgs],
+                    env: launchEnv,
+                });
+                return { browser, errors };
+            } catch (e) {
+                const msg = e instanceof Error ? e.message : String(e);
+                const firstLine = msg.split(/\r?\n/).find((l) => l.trim()) ?? msg;
+                errors.push(`${path.basename(executablePath)} (${String(strategy.headless)}): ${firstLine}`);
+            }
+        }
+    }
+
+    return { browser: undefined, errors };
+}
+
+function runBrowserCliProcess(
+    executablePath: string,
+    args: string[],
+    launchEnv: NodeJS.ProcessEnv,
+    timeoutMs: number = 30000,
+): Promise<{ code: number | null; stderr: string }> {
+    return new Promise((resolve) => {
+        let stderr = '';
+        let settled = false;
+        const child = spawn(executablePath, args, {
+            env: launchEnv,
+            windowsHide: true,
+            stdio: ['ignore', 'ignore', 'pipe'],
+        });
+
+        const timer = setTimeout(() => {
+            if (!settled) {
+                settled = true;
+                try {
+                    child.kill();
+                } catch {
+                    // Ignore kill error on timed-out CLI child
+                }
+                resolve({ code: null, stderr: stderr || 'Timed out' });
+            }
+        }, timeoutMs);
+
+        child.stderr?.on('data', (chunk: Buffer) => {
+            if (stderr.length < 4096) {
+                stderr += chunk.toString('utf-8');
+            }
+        });
+
+        child.on('error', (err) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve({ code: null, stderr: err.message });
+        });
+
+        child.on('close', (code) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve({ code, stderr });
+        });
+    });
+}
+
+async function exportViaBrowserCli(
+    executables: ReadonlyArray<string>,
+    tmpHtmlPath: string,
+    tmpDir: string,
+    targetPath: string,
+    format: 'png' | 'pdf',
+    viewportWidth: number,
+    launchEnv: NodeJS.ProcessEnv,
+): Promise<{ ok: boolean; errors: string[] }> {
+    const fileUrl = pathToFileURL(tmpHtmlPath).href;
+    const errors: string[] = [];
+    let attemptIdx = 0;
+
+    for (const executablePath of executables) {
+        for (const headlessFlag of ['--headless=new', '--headless']) {
+            const idx = attemptIdx++;
+            const userDataDir = path.join(tmpDir, `cli-profile-${idx}`);
+            const cliTargetPath = path.join(tmpDir, `cli-output-${idx}.${format}`);
+            const args = [
+                headlessFlag,
+                `--user-data-dir=${userDataDir}`,
+                '--disable-gpu',
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-background-mode',
+                '--disable-features=msEdgeStartupBoost,msEdgeOnRamp',
+                '--allow-file-access-from-files',
+                ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-setuid-sandbox'] : []),
+                ...(format === 'pdf'
+                    ? ['--print-to-pdf-no-header', '--no-pdf-header-footer', `--print-to-pdf=${cliTargetPath}`]
+                    : [`--window-size=${viewportWidth},2400`, '--force-device-scale-factor=2', '--hide-scrollbars', `--screenshot=${cliTargetPath}`]),
+                fileUrl,
+            ];
+
+            const res = await runBrowserCliProcess(executablePath, args, launchEnv);
+            if (fs.existsSync(cliTargetPath) && fs.statSync(cliTargetPath).size > 0) {
+                fs.copyFileSync(cliTargetPath, targetPath);
+                return { ok: true, errors };
+            }
+            const errLine = res.stderr.split(/\r?\n/).find((l) => l.trim()) ?? `exit ${String(res.code)}`;
+            errors.push(`${path.basename(executablePath)} CLI (${headlessFlag}): ${errLine}`);
+        }
+    }
+
+    return { ok: false, errors };
 }
 
 function escapeHeaderHtml(text: string): string {
@@ -197,23 +383,48 @@ export class DevLogExportService {
         let browser: { close: () => Promise<void> } | undefined;
 
         try {
-            const executablePath = findChromiumExecutable();
+            const executables = findChromiumExecutables();
             fs.writeFileSync(tmpHtmlPath, payload.content, 'utf-8');
+
+            const launchEnv = buildLaunchEnv();
+            const baseArgs = buildBrowserBaseArgs();
+            const viewportWidth = payload.viewportWidth ?? 960;
 
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const puppeteer = require('puppeteer-core');
-            const puppeteerArgs = process.platform === 'linux'
-                ? ['--allow-file-access-from-files', '--no-sandbox', '--disable-setuid-sandbox']
-                : ['--allow-file-access-from-files'];
+            const launchResult = await launchPuppeteerBrowser(
+                puppeteer,
+                executables,
+                tmpDir,
+                baseArgs,
+                launchEnv,
+            );
+            browser = launchResult.browser;
 
-            browser = await puppeteer.launch({
-                headless: true,
-                executablePath,
-                args: puppeteerArgs,
-            });
+            if (!browser) {
+                const cliResult = await exportViaBrowserCli(
+                    executables,
+                    tmpHtmlPath,
+                    tmpDir,
+                    targetPath,
+                    payload.format,
+                    viewportWidth,
+                    launchEnv,
+                );
+                if (cliResult.ok) {
+                    void this.notifySuccess(targetUri);
+                    return { savedPath: targetPath, error: null };
+                }
+                const triedNames = executables.map((exe) => path.basename(exe)).join(', ');
+                const allErrors = [...launchResult.errors, ...cliResult.errors];
+                const lastError = allErrors[allErrors.length - 1] ?? 'Unknown launch error';
+                return {
+                    savedPath: null,
+                    error: i18n('ext.git.devLogBrowserLaunchFailed', `${triedNames}: ${lastError}`),
+                };
+            }
 
             const page = await (browser as any).newPage();
-            const viewportWidth = payload.viewportWidth ?? 960;
             await page.setViewport({
                 width: viewportWidth,
                 height: 800,
@@ -261,12 +472,17 @@ export class DevLogExportService {
             const msg = e instanceof Error ? e.message : String(e);
             return { savedPath: null, error: msg };
         } finally {
-            try {
-                if (browser) {
+            if (browser) {
+                try {
                     await browser.close();
+                } catch {
+                    // Ignore browser close error during cleanup
                 }
-            } finally {
-                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
+            try {
+                fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 120 });
+            } catch {
+                // Ignore Windows EBUSY lock on temp dir cleanup
             }
         }
     }
