@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { $t } from '../../../i18n/i18nConfig';
-import type { DevLogTemplate } from '../util/devLogRenderer';
 import VscodeDropdown from './VscodeDropdown';
 import { FetchIcon, PullIcon, PushIcon, RefreshIcon, RemoteIcon, FindIcon, SettingsIcon, ThemeToggleIcon, ExpandLayoutIcon, ExportIcon } from './ToolbarIcons';
 
@@ -37,7 +36,7 @@ interface ToolbarProps {
     onToggleSettings: () => void;
     onExpandLayout: () => void;
     onToggleColorMode: () => void;
-    onExportDevLog: (template: DevLogTemplate) => void;
+    onExportDevLog: () => void;
 }
 
 function repoLabel(path: string): string {
@@ -53,29 +52,6 @@ export default function Toolbar({
     onSearchChange, onSearch,
     onFetch, onPull, onPush, onOpenRemote, onToggleFind, onRefresh, onToggleSettings, onExpandLayout, onToggleColorMode, onExportDevLog,
 }: ToolbarProps) {
-    const [exportMenuOpen, setExportMenuOpen] = useState(false);
-    const exportMenuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!exportMenuOpen) return;
-        const onDocMouseDown = (e: globalThis.MouseEvent) => {
-            if (!exportMenuRef.current?.contains(e.target as Node)) {
-                setExportMenuOpen(false);
-            }
-        };
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                setExportMenuOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', onDocMouseDown);
-        document.addEventListener('keydown', onKeyDown);
-        return () => {
-            document.removeEventListener('mousedown', onDocMouseDown);
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [exportMenuOpen]);
-
     const showRepo = repos.length > 1;
     const remoteOpClass = fetching
         ? ' git-graph-toolbar--fetching'
@@ -175,64 +151,11 @@ export default function Toolbar({
                     className={findActive ? 'active' : undefined}
                     disabled={!repo}
                 />
-                <div className="git-graph-export-menu-wrap" ref={exportMenuRef}>
-                    <ExportIcon
-                        title={$t('git.devLog.exportTooltip')}
-                        onClick={() => setExportMenuOpen((open) => !open)}
-                        className={exportMenuOpen ? 'active' : undefined}
-                        disabled={!repo}
-                    />
-                    {exportMenuOpen && (
-                        <div className="git-graph-export-submenu" role="menu" aria-label={$t('git.devLog.menuTitle')}>
-                            <div className="git-graph-export-submenu-header">{$t('git.devLog.menuTitle')}</div>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                className="git-graph-export-submenu-item"
-                                onClick={() => {
-                                    setExportMenuOpen(false);
-                                    onExportDevLog('timeline');
-                                }}
-                            >
-                                <span className="codicon codicon-list-unordered" aria-hidden />
-                                <span className="git-graph-export-submenu-text">
-                                    <strong>{$t('git.devLog.templateTimeline')}</strong>
-                                    <small>{$t('git.devLog.templateTimelineDesc')}</small>
-                                </span>
-                            </button>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                className="git-graph-export-submenu-item"
-                                onClick={() => {
-                                    setExportMenuOpen(false);
-                                    onExportDevLog('report');
-                                }}
-                            >
-                                <span className="codicon codicon-file-pdf" aria-hidden />
-                                <span className="git-graph-export-submenu-text">
-                                    <strong>{$t('git.devLog.templateReport')}</strong>
-                                    <small>{$t('git.devLog.templateReportDesc')}</small>
-                                </span>
-                            </button>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                className="git-graph-export-submenu-item"
-                                onClick={() => {
-                                    setExportMenuOpen(false);
-                                    onExportDevLog('graph');
-                                }}
-                            >
-                                <span className="codicon codicon-git-merge" aria-hidden />
-                                <span className="git-graph-export-submenu-text">
-                                    <strong>{$t('git.devLog.templateGraph')}</strong>
-                                    <small>{$t('git.devLog.templateGraphDesc')}</small>
-                                </span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                <ExportIcon
+                    title={$t('git.devLog.exportTooltip')}
+                    onClick={onExportDevLog}
+                    disabled={!repo}
+                />
                 <SettingsIcon
                     title={$t('git.repoSettingsTooltip')}
                     onClick={onToggleSettings}

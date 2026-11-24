@@ -389,7 +389,6 @@ export default {
         devLog: {
             exportBtn: 'Export Dev Log',
             exportTooltip: 'Export development log (PNG / PDF / Markdown)',
-            menuTitle: 'Choose Export Template',
             templateTimeline: 'Card Timeline',
             templateTimelineDesc: 'Visual timeline cards with activity chart, ideal for PNG sharing',
             templateReport: 'Formal Paginated Report',

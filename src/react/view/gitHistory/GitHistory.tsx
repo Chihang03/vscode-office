@@ -1529,7 +1529,7 @@ function GitHistoryView({
                 onExpandLayout={handleExpandLayout}
                 adaptiveColorMode={adaptiveColorMode}
                 onToggleColorMode={onToggleColorMode}
-                onExportDevLog={(template) => setDevLogModal({ open: true, template, useSelection: false })}
+                onExportDevLog={() => setDevLogModal((prev) => ({ open: true, template: prev.template, useSelection: false }))}
             />
             <div className="git-graph-body" ref={bodyRef}>
                 <div className="git-graph-body-main">

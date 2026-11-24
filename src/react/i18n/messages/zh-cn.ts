@@ -389,7 +389,6 @@ export default {
         devLog: {
             exportBtn: '导出日志',
             exportTooltip: '导出开发日志（PNG / PDF / Markdown）',
-            menuTitle: '选择导出样式',
             templateTimeline: '卡片时间线',
             templateTimelineDesc: '含统计卡片与活跃趋势，适合周报和图片分享',
             templateReport: '正式分页报告',
